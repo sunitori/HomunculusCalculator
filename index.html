@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homunculus Comparator - Ragnarok Zero</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    /* ---------- THEME VARIABLES ---------- */
+    :root {
+      --bg-body: #f4fbfa;
+      --text-color: #2f5d58;
+      --panel-border: #7fb0ab;
+      --panel-header-bg-1: #b8dcd8;
+      --panel-header-bg-2: #a1c9c5;
+      --panel-header-text-shadow: #5a8f89;
+      --panel-body-bg: #e6f2f1;
+      --label-color: #2f5d58;
+      --input-border: #8fb8b4;
+      --input-bg: #ffffff;
+      --bar-container-bg: #d9e6e4;
+      --bar-container-border: #8fb8b4;
+      --percent-color: #2f5d58;
+      --select-border: #8fb8b4;
+      --select-bg: #ffffff;
+      --select-text: #2f5d58;
+      --shadow-color: rgba(0,0,0,0.15);
+      --sprite-filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
+      --avg-line-color: rgba(0,0,0,0.55);
+    }
+
+    body.dark {
+      --bg-body: #121a1a;
+      --text-color: #c0e0dc;
+      --panel-border: #4a7a76;
+      --panel-header-bg-1: #2e4f4c;
+      --panel-header-bg-2: #1f3a38;
+      --panel-header-text-shadow: #0a1413;
+      --panel-body-bg: #1a2a29;
+      --label-color: #a1c9c5;
+      --input-border: #4a7a76;
+      --input-bg: #1e2f2e;
+      --bar-container-bg: #2a3d3b;
+      --bar-container-border: #4a7a76;
+      --percent-color: #a1c9c5;
+      --select-border: #4a7a76;
+      --select-bg: #1e2f2e;
+      --select-text: #c0e0dc;
+      --shadow-color: rgba(0,0,0,0.5);
+      --sprite-filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.6));
+      --avg-line-color: rgba(255,255,255,0.55);
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg-body);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    .top-bar {
+      text-align: right;
+      margin-bottom: 5px;
+    }
+    .top-bar button {
+      background: transparent;
+      border: 1px solid var(--panel-border);
+      color: var(--text-color);
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .top-bar button:hover {
+      background: var(--panel-header-bg-2);
+      color: #ffffff;
+    }
+
+    .logo {
+      display: block;
+      margin: 0 auto 20px;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* ---------- CONTROL ROW ---------- */
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      justify-items: center;
+      gap: 15px;
+      margin: 0 auto 20px auto;
+      max-width: 500px;
+    }
+    .sprite-left {
+      height: 60px;
+      width: auto;
+      image-rendering: pixelated;
+      filter: var(--sprite-filter);
+      transform: scaleX(-1);
+      justify-self: end;
+    }
+    .sprite-right {
+      height: 60px;
+      width: auto;
+      image-rendering: pixelated;
+      filter: var(--sprite-filter);
+      justify-self: start;
+    }
+    .select-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .select-group label {
+      font-weight: bold;
+      color: var(--label-color);
+      margin: 0;
+    }
+    .select-group select {
+      padding: 6px 10px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid var(--select-border);
+      background: var(--select-bg);
+      color: var(--select-text);
+      cursor: pointer;
+    }
+
+    /* ---------- PANEL ---------- */
+    .panel {
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px var(--shadow-color);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .panel-header {
+      background: linear-gradient(to bottom, var(--panel-header-bg-1), var(--panel-header-bg-2));
+      color: #ffffff;
+      padding: 8px 14px;
+      font-weight: bold;
+      font-size: 18px;
+      text-shadow: 1px 1px 2px var(--panel-header-text-shadow);
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .panel-title {
+      white-space: nowrap;
+    }
+
+    /* ---------- SKILL SELECTOR ---------- */
+    .skill-selector {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: normal;
+      letter-spacing: normal;
+      text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+    }
+    .skill-selector.hidden {
+      display: none;
+    }
+    .skill-selector img {
+      width: 24px;
+      height: 24px;
+      image-rendering: pixelated;
+      filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3));
+    }
+    .skill-selector .skill-name {
+      color: #ffffff;
+    }
+    .skill-selector select {
+      padding: 2px 4px;
+      font-size: 12px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.95);
+      color: #2f5d58;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .panel-body {
+      background: var(--panel-body-bg);
+      padding: 16px 18px;
+    }
+
+    /* ---------- STAT ROWS ---------- */
+    .stat-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .stat-label {
+      width: 80px;
+      font-weight: bold;
+      color: var(--label-color);
+      font-size: 14px;
+    }
+    .stat-input {
+      width: 80px;
+      padding: 5px 6px;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      font-size: 14px;
+      background: var(--input-bg);
+      color: var(--text-color);
+    }
+
+    /* ---------- BAR WRAPPER ---------- */
+    .bar-wrapper {
+      flex-grow: 1;
+      min-width: 80px;
+      margin: 0 10px;
+    }
+    .bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--label-color);
+      opacity: 0.9;
+      padding: 0 2px;
+      margin-bottom: 2px;
+      line-height: 1;
+      letter-spacing: 0.3px;
+      user-select: none;
+    }
+    .bar-header {
+      text-align: center;
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--label-color);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0.85;
+      user-select: none;
+      padding-bottom: 2px;
+    }
+    .bar-container {
+      position: relative;
+      height: 18px;
+      background: var(--bar-container-bg);
+      border: 1px solid var(--bar-container-border);
+      border-radius: 9px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .bar {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      width: 0%;
+      background: #4caf50;
+      transition: width 0.25s ease, background-color 0.25s ease;
+      border-radius: 9px;
+    }
+    .avg-line {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--avg-line-color);
+      transform: translateX(-50%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .percent {
+      width: 55px;
+      text-align: right;
+      font-weight: bold;
+      font-size: 14px;
+      color: var(--percent-color);
+    }
+    .percent-spacer {
+      width: 55px;
+    }
+    .stat-row.level-row .stat-label {
+      color: var(--label-color);
+    }
+
+    /* ---------- MOBILE ---------- */
+    @media (max-width: 600px) {
+      .controls {
+        display: flex;
+        flex-direction: column;
+        max-width: none;
+        gap: 8px;
+      }
+      .sprite-left, .sprite-right {
+        justify-self: auto;
+      }
+      .sprite-left {
+        transform: scaleX(-1);
+      }
+      .panel-header {
+        font-size: 16px;
+      }
+      .skill-selector {
+        font-size: 11px;
+      }
+      .skill-selector img {
+        width: 20px;
+        height: 20px;
+      }
+      .skill-selector .skill-name {
+        display: none; /* save space on mobile */
+      }
+      .stat-row {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 12px;
+      }
+      .stat-input {
+        width: 100%;
+        max-width: 120px;
+      }
+      .bar-wrapper {
+        width: 100%;
+        margin: 6px 0;
+      }
+      .percent, .percent-spacer {
+        width: auto;
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <button id="themeToggle">🌙 Dark Mode</button>
+    </div>
+
+    <img src="https://minnii.de/wp-content/uploads/2026/04/game_rozero-event-logo.webp" alt="Ragnarok Zero Logo" class="logo">
+
+    <div class="controls">
+      <img id="sprite1" src="" alt="Type 1" class="sprite-left">
+      <div class="select-group">
+        <label for="homunculusType">Select Homunculus:</label>
+        <select id="homunculusType">
+          <option value="Amistr">Amistr</option>
+          <option value="Filir">Filir</option>
+          <option value="Lif">Lif</option>
+          <option value="Vanilmirth">Vanilmirth</option>
+        </select>
+      </div>
+      <img id="sprite2" src="" alt="Type 2" class="sprite-right">
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Homunculus Calculation</span>
+        <div class="skill-selector hidden" id="skillSelector">
+          <img id="skillIcon" src="" alt="Skill">
+          <span class="skill-name" id="skillName">Skill</span>
+          <select id="skillLevel" title="Skill level (0 = off)">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+      </div>
+      <div class="panel-body" id="statsContainer">
+        <!-- Dynamically generated stat rows -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- DATA ----------
+    const homunculusData = {
+      Amistr: {
+        base: { HP: 320, SP: 10, ATK: 28, MATK: 60, HIT: 175, CRITICAL: 5, DEF: 78, MDEF: 37, FLEE: 118, ASPD: 136 },
+        minGain: { HP: 81, SP: 6, ATK: 0, MATK: 4, HIT: 1, CRITICAL: 0, DEF: 2, MDEF: 1, FLEE: 1, ASPD: 0 },
+        maxGain: { HP: 298, SP: 20, ATK: 4, MATK: 15, HIT: 3, CRITICAL: 1, DEF: 9, MDEF: 6, FLEE: 5, ASPD: 1 }
+      },
+      Filir: {
+        base: { HP: 280, SP: 12, ATK: 30, MATK: 50, HIT: 180, CRITICAL: 7, DEF: 70, MDEF: 30, FLEE: 130, ASPD: 140 },
+        minGain: { HP: 60, SP: 5, ATK: 1, MATK: 3, HIT: 1, CRITICAL: 0, DEF: 1, MDEF: 1, FLEE: 2, ASPD: 0 },
+        maxGain: { HP: 200, SP: 15, ATK: 5, MATK: 12, HIT: 3, CRITICAL: 2, DEF: 8, MDEF: 5, FLEE: 6, ASPD: 1 }
+      },
+      Lif: {
+        base: { HP: 150, SP: 40, ATK: 25, MATK: 144, HIT: 175, CRITICAL: 5, DEF: 40, MDEF: 46, FLEE: 121, ASPD: 137 },
+        minGain: { HP: 61, SP: 4, ATK: 0.50, MATK: 4, HIT: 1.36, CRITICAL: 0.2, DEF: 0.50, MDEF: 0.34, FLEE: 1, ASPD: 0.34 },
+        maxGain: { HP: 200, SP: 15, ATK: 3.67, MATK: 20, HIT: 4.1, CRITICAL: 0.34, DEF: 7.67, MDEF: 5.67, FLEE: 3.67, ASPD: 0.67 }
+      },
+      Vanilmirth: {
+        base: { HP: 80, SP: 11, ATK: 16, MATK: 52, HIT: 162, CRITICAL: 4, DEF: 27, MDEF: 19, FLEE: 112, ASPD: 133 },
+        minGain: { HP: 45, SP: 0, ATK: 1.00, MATK: 5, HIT: 1.00, CRITICAL: 0.24, DEF: 2, MDEF: 1.00, FLEE: 1.00, ASPD: 0.27 },
+        maxGain: { HP: 281, SP: 12, ATK: 5.90, MATK: 23, HIT: 5.50, CRITICAL: 1.14, DEF: 11, MDEF: 7.87, FLEE: 5.72, ASPD: 1.43 }
+      }
+    };
+
+    const sprites = {
+      // WIP
+      Amistr: {
+        type1: 'https://irowiki.org/w/images/a/ac/Amistr.png',
+        type2: 'https://irowiki.org/w/images/f/f6/Amistr2.png'
+      },
+      // WIP
+      Filir: {
+        type1: 'https://irowiki.org/w/images/7/73/Filir.png',
+        type2: 'https://irowiki.org/w/images/c/cd/Filir2.png'
+      },
+      Lif: {
+        type1: 'https://irowiki.org/w/images/3/35/Lif.png',
+        type2: 'https://irowiki.org/w/images/0/0f/Lif2.png'
+      },
+      Vanilmirth: {
+        type1: 'https://irowiki.org/w/images/0/0d/Vanilmirth.png',
+        type2: 'https://irowiki.org/w/images/2/25/Vanilmirth2.png'
+      }
+    };
+
+    // ---------- SKILL DATA ----------
+    // Each skill defines the effect of levels 0–5 on one or more stats.
+    //   kind: 'percent'  -> value / (1 + bonus/100)  (removes the skill bonus)
+    //   kind: 'flat'     -> value - bonus            (removes the skill bonus)
+    // Filir has no skill (undefined entry = selector hidden).
+    const skillData = {
+      Amistr: {
+        name: 'Adamantium Skin',
+        icon: 'https://irowiki.org/w/images/4/44/Adamantium_Skin.png',
+        effects: {
+          HP:  { kind: 'percent', values: [0, 2, 4, 6, 8, 10] },
+          DEF: { kind: 'flat',    values: [0, 4, 8, 12, 16, 20] }
+        }
+      },
+      Lif: {
+        name: 'Brain Surgery',
+        icon: 'https://irowiki.org/w/images/1/13/Brain_Surgery.png',
+        effects: {
+          SP: { kind: 'percent', values: [0, 1, 2, 3, 4, 5] }
+        }
+      },
+      Vanilmirth: {
+        name: 'Instruction Change',
+        icon: 'https://irowiki.org/w/images/e/e4/Instruction_Change.png',
+        effects: {
+          ATK:  { kind: 'flat', values: [0, 0.5, 0.5, 1.5, 2.0, 2.0] },
+          MATK: { kind: 'flat', values: [0, 3.6, 7.2, 7.2, 14.4, 18.0] },
+          MDEF: { kind: 'flat', values: [0, 1.2, 2.4, 2.4, 4.8, 6.0] }
+        }
+      }
+    };
+
+    const statKeys = ['HP', 'SP', 'ATK', 'MATK', 'HIT', 'CRITICAL', 'DEF', 'MDEF', 'FLEE', 'ASPD'];
+    const statLabels = {
+      HP: 'HP',
+      SP: 'SP',
+      ATK: 'ATK',
+      MATK: 'MATK',
+      HIT: 'HIT',
+      CRITICAL: 'CRITICAL',
+      DEF: 'DEF',
+      MDEF: 'MDEF',
+      FLEE: 'FLEE',
+      ASPD: 'ASPD'
+    };
+
+    // ---------- STATISTICAL HELPERS ----------
+    function normalCDF(z) {
+      const t = 1 / (1 + 0.2316419 * Math.abs(z));
+      const d = 0.3989423 * Math.exp(-z * z / 2);
+      const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+      return z > 0 ? 1 - p : p;
+    }
+
+    let currentType = 'Amistr';
+    let currentData = homunculusData[currentType];
+    let currentSkillLevel = 0;
+
+    const select = document.getElementById('homunculusType');
+    const sprite1 = document.getElementById('sprite1');
+    const sprite2 = document.getElementById('sprite2');
+    const statsContainer = document.getElementById('statsContainer');
+    const skillSelector = document.getElementById('skillSelector');
+    const skillIcon = document.getElementById('skillIcon');
+    const skillName = document.getElementById('skillName');
+    const skillLevelSelect = document.getElementById('skillLevel');
+
+    // ---------- BUILD UI ----------
+    function buildStatsUI() {
+      statsContainer.innerHTML = '';
+
+      const levelRow = document.createElement('div');
+      levelRow.className = 'stat-row level-row';
+      levelRow.innerHTML = `
+        <span class="stat-label">LVL</span>
+        <input type="number" class="stat-input" id="input-LVL" min="1" max="60" step="1" value="1">
+        <div class="bar-wrapper">
+          <div class="bar-header">Percentile</div>
+        </div>
+        <span class="percent-spacer"></span>
+      `;
+      statsContainer.appendChild(levelRow);
+
+      statKeys.forEach(key => {
+        const row = document.createElement('div');
+        row.className = 'stat-row';
+        row.innerHTML = `
+          <span class="stat-label">${statLabels[key]}</span>
+          <input type="number" class="stat-input" id="input-${key}" step="1" value="0">
+          <div class="bar-wrapper">
+            <div class="bar-labels"><span>1st</span><span>50th</span><span>99th</span></div>
+            <div class="bar-container">
+              <div class="bar" id="bar-${key}"></div>
+              <div class="avg-line"></div>
+            </div>
+          </div>
+          <span class="percent" id="percent-${key}">0%</span>
+        `;
+        statsContainer.appendChild(row);
+      });
+
+      document.getElementById('input-LVL').addEventListener('input', updateAll);
+      statKeys.forEach(key => {
+        document.getElementById(`input-${key}`).addEventListener('input', updateAll);
+      });
+    }
+
+    // ---------- RESET INPUTS ----------
+    function resetInputs() {
+      const levelInput = document.getElementById('input-LVL');
+      levelInput.value = 1;
+      statKeys.forEach(key => {
+        const input = document.getElementById(`input-${key}`);
+        input.value = currentData.base[key];
+      });
+      updateAll();
+    }
+
+    // ---------- SKILL SELECTOR ----------
+    function updateSkillSelector() {
+      const skill = skillData[currentType];
+      if (!skill) {
+        skillSelector.classList.add('hidden');
+        return;
+      }
+      skillSelector.classList.remove('hidden');
+      skillIcon.src = skill.icon;
+      skillIcon.alt = skill.name;
+      skillName.textContent = skill.name;
+      skillLevelSelect.value = '0';
+      currentSkillLevel = 0;
+    }
+
+    // ---------- CALCULATIONS ----------
+    // Bar position = actual percentile of the entered value.
+    // Skill bonuses are removed from the entered value before the percentile
+    // is computed, so the bar reflects the *base* stat distribution.
+    function updateAll() {
+      const levelInput = document.getElementById('input-LVL');
+      let level = parseInt(levelInput.value);
+      if (isNaN(level) || level < 1) level = 1;
+      if (level > 60) level = 60;
+      levelInput.value = level;
+
+      const n = level - 1;
+      const skill = skillData[currentType];
+      const effects = (skill && currentSkillLevel > 0) ? skill.effects : {};
+
+      statKeys.forEach(key => {
+        const base = currentData.base[key];
+        const minGain = currentData.minGain[key];
+        const maxGain = currentData.maxGain[key];
+
+        const mean = base + n * (minGain + maxGain) / 2;
+        const sigma = Math.sqrt(n) * (maxGain - minGain) / Math.sqrt(12);
+
+        const input = document.getElementById(`input-${key}`);
+        let value = parseFloat(input.value);
+        if (isNaN(value)) value = 0;
+
+        // Strip out the skill's contribution to this stat (if any)
+        let adjustedValue = value;
+        const eff = effects[key];
+        if (eff) {
+          const bonus = eff.values[currentSkillLevel];
+          if (eff.kind === 'percent') {
+            adjustedValue = value / (1 + bonus / 100);
+          } else if (eff.kind === 'flat') {
+            adjustedValue = value - bonus;
+          }
+        }
+
+        let percentile;
+        if (sigma === 0) {
+          percentile = 50;
+        } else {
+          const z = (adjustedValue - mean) / sigma;
+          percentile = normalCDF(z) * 100;
+          percentile = Math.max(0, Math.min(100, percentile));
+        }
+
+        const bar = document.getElementById(`bar-${key}`);
+        bar.style.width = percentile + '%';
+
+        if (percentile < 1) {
+          bar.style.backgroundColor = '#808080';
+        } else if (percentile > 99) {
+          bar.style.backgroundColor = '#a335ee';
+        } else if (percentile < 25) {
+          bar.style.backgroundColor = '#d32f2f';
+        } else if (percentile < 50) {
+          bar.style.backgroundColor = '#ffc107';
+        } else if (percentile < 75) {
+          bar.style.backgroundColor = '#8bc34a';
+        } else {
+          bar.style.backgroundColor = '#2e7d32';
+        }
+
+        let label;
+        if (percentile < 1) {
+          label = '<1%';
+        } else if (percentile > 99) {
+          label = '>99%';
+        } else {
+          label = Math.round(percentile) + '%';
+        }
+        document.getElementById(`percent-${key}`).textContent = label;
+      });
+    }
+
+    // ---------- TYPE CHANGE ----------
+    function updateType() {
+      currentType = select.value;
+      currentData = homunculusData[currentType];
+
+      sprite1.src = sprites[currentType].type1;
+      sprite2.src = sprites[currentType].type2;
+
+      updateSkillSelector();
+      resetInputs();
+    }
+
+    // ---------- INITIALIZATION ----------
+    buildStatsUI();
+    updateType();
+
+    select.addEventListener('change', updateType);
+
+    // Skill level change -> recompute
+    skillLevelSelect.addEventListener('change', () => {
+      currentSkillLevel = parseInt(skillLevelSelect.value) || 0;
+      updateAll();
+    });
+
+    // ---------- DARK MODE TOGGLE ----------
+    const themeToggle = document.getElementById('themeToggle');
+
+    function applyTheme(dark) {
+      if (dark) {
+        document.body.classList.add('dark');
+        themeToggle.textContent = '☀️ Light Mode';
+      } else {
+        document.body.classList.remove('dark');
+        themeToggle.textContent = '🌙 Dark Mode';
+      }
+    }
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      applyTheme(true);
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.body.classList.contains('dark');
+      applyTheme(!isDark);
+      localStorage.setItem('theme', isDark ? 'light' : 'dark');
+    });
+  </script>
+</body>
+</html>
