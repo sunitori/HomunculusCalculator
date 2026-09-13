@@ -30,6 +30,12 @@
       --shadow-color: rgba(0,0,0,0.15);
       --sprite-filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
       --avg-line-color: rgba(0,0,0,0.55);
+
+      /* Speech bubble (parchment) */
+      --bubble-bg: #f7ecc9;
+      --bubble-border: #c9b47a;
+      --bubble-text: #5a4a2a;
+      --bubble-shadow: rgba(120, 95, 40, 0.25);
     }
 
     body.dark {
@@ -52,6 +58,12 @@
       --shadow-color: rgba(0,0,0,0.5);
       --sprite-filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.6));
       --avg-line-color: rgba(255,255,255,0.55);
+
+      /* Speech bubble (muted parchment for dark mode) */
+      --bubble-bg: #3a3220;
+      --bubble-border: #7a6a3a;
+      --bubble-text: #ecdcaa;
+      --bubble-shadow: rgba(0,0,0,0.5);
     }
 
     body {
@@ -87,14 +99,63 @@
       color: #ffffff;
     }
 
+    /* ---------- LOGO ROW (bubble + logo) ---------- */
+    .logo-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin: 0 auto 20px;
+    }
+
+    .speech-bubble {
+      position: relative;
+      max-width: 240px;
+      padding: 10px 14px;
+      background: var(--bubble-bg);
+      border: 1px solid var(--bubble-border);
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--bubble-text);
+      box-shadow: 0 2px 6px var(--bubble-shadow);
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+    }
+    /* Tail pointing right toward the logo */
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 10px solid var(--bubble-border);
+    }
+    .speech-bubble::before {
+      content: '';
+      position: absolute;
+      right: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-left: 9px solid var(--bubble-bg);
+      z-index: 1;
+    }
+
     .logo {
       display: block;
-      margin: 0 auto 20px;
       width: 154px;
       max-width: 100%;
       height: auto;
       image-rendering: pixelated;
       transform: translateZ(0);
+      flex-shrink: 0;
     }
 
     /* ---------- CONTROL ROW ---------- */
@@ -231,6 +292,11 @@
       background: var(--input-bg);
       color: var(--text-color);
     }
+    .stat-input:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: var(--bar-container-bg);
+    }
 
     /* ---------- BAR WRAPPER ---------- */
     .bar-wrapper {
@@ -307,6 +373,18 @@
 
     /* ---------- MOBILE ---------- */
     @media (max-width: 600px) {
+      .logo-row {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .speech-bubble {
+        max-width: 100%;
+        order: 2; /* place bubble below logo on mobile */
+      }
+      .speech-bubble::after,
+      .speech-bubble::before {
+        display: none; /* hide tail when stacked */
+      }
       .controls {
         display: flex;
         flex-direction: column;
@@ -359,7 +437,12 @@
       <button id="themeToggle">🌙 Dark Mode</button>
     </div>
 
-    <img src="./resources/xiaomao.png" alt="Xiaomao Homunculus Calculator" class="logo">
+    <div class="logo-row">
+      <div class="speech-bubble">
+        fellow alchemist~ all values are based on empirical data and percentile calculation. no data mining so some inaccuracies may occur.
+      </div>
+      <img src="./resources/xiaomao.png" alt="Xiaomao Homunculus Calculator" class="logo">
+    </div>
 
     <div class="controls">
       <img id="sprite1" src="" alt="Type 1" class="sprite-left">
@@ -663,6 +746,10 @@
 
       updateSkillSelector();
       resetInputs();
+
+      // Lock all input fields for WIP homunculi (Filir)
+      const locked = currentType === 'Filir';
+      statsContainer.querySelectorAll('.stat-input').forEach(el => el.disabled = locked);
     }
 
     // ---------- INITIALIZATION ----------
@@ -698,7 +785,7 @@
     themeToggle.addEventListener('click', () => {
       const isDark = document.body.classList.contains('dark');
       applyTheme(!isDark);
-      localStorage.setItem('theme', isDark ? 'light' : 'dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
     });
   </script>
 </body>
