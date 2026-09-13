@@ -90,6 +90,7 @@
     .logo {
       display: block;
       margin: 0 auto 20px;
+      width: 400px;
       max-width: 100%;
       height: auto;
     }
@@ -420,21 +421,21 @@
     const sprites = {
       // WIP
       Amistr: {
-        type1: 'https://irowiki.org/w/images/a/ac/Amistr.png',
-        type2: 'https://irowiki.org/w/images/f/f6/Amistr2.png'
+        type1: './resources/Amistr.png',
+        type2: './resources/Amistr2.png'
       },
       // WIP
       Filir: {
-        type1: 'https://irowiki.org/w/images/7/73/Filir.png',
-        type2: 'https://irowiki.org/w/images/c/cd/Filir2.png'
+        type1: './resources/Filir.png',
+        type2: './resources/Filir2.png'
       },
       Lif: {
-        type1: 'https://irowiki.org/w/images/3/35/Lif.png',
-        type2: 'https://irowiki.org/w/images/0/0f/Lif2.png'
+        type1: './resources/Lif.png',
+        type2: './resources/Lif2.png'
       },
       Vanilmirth: {
-        type1: 'https://irowiki.org/w/images/0/0d/Vanilmirth.png',
-        type2: 'https://irowiki.org/w/images/2/25/Vanilmirth2.png'
+        type1: './resources/Vanilmirth.png',
+        type2: './resources/Vanilmirth2.png'
       }
     };
 
@@ -446,7 +447,7 @@
     const skillData = {
       Amistr: {
         name: 'Adamantium Skin',
-        icon: 'https://irowiki.org/w/images/4/44/Adamantium_Skin.png',
+        icon: './resources/Adamantium_Skin.png',
         effects: {
           HP:  { kind: 'percent', values: [0, 2, 4, 6, 8, 10] },
           DEF: { kind: 'flat',    values: [0, 4, 8, 12, 16, 20] }
@@ -454,14 +455,14 @@
       },
       Lif: {
         name: 'Brain Surgery',
-        icon: 'https://irowiki.org/w/images/1/13/Brain_Surgery.png',
+        icon: './resources/Brain_Surgery.png',
         effects: {
           SP: { kind: 'percent', values: [0, 1, 2, 3, 4, 5] }
         }
       },
       Vanilmirth: {
         name: 'Instruction Change',
-        icon: 'https://irowiki.org/w/images/e/e4/Instruction_Change.png',
+        icon: './resources/Instruction_Change.png',
         effects: {
           ATK:  { kind: 'flat', values: [0, 0.5, 0.5, 1.5, 2.0, 2.0] },
           MATK: { kind: 'flat', values: [0, 3.6, 7.2, 7.2, 14.4, 18.0] },
