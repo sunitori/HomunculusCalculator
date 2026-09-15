@@ -3,13 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xiaomao’s Homunculus Calculation - Ragnarok Zero Global</title>
+  <title>Xiaomao's Homunculus Calculation - Ragnarok Zero Global</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
-    /* ---------- THEME VARIABLES ---------- */
     :root {
       --bg-body: #f4fbfa;
       --text-color: #2f5d58;
@@ -30,8 +27,6 @@
       --shadow-color: rgba(0,0,0,0.15);
       --sprite-filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
       --avg-line-color: rgba(0,0,0,0.55);
-
-      /* Speech bubble (parchment) */
       --bubble-bg: #f7ecc9;
       --bubble-border: #c9b47a;
       --bubble-text: #5a4a2a;
@@ -58,8 +53,6 @@
       --shadow-color: rgba(0,0,0,0.5);
       --sprite-filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.6));
       --avg-line-color: rgba(255,255,255,0.55);
-
-      /* Speech bubble (muted parchment for dark mode) */
       --bubble-bg: #3a3220;
       --bubble-border: #7a6a3a;
       --bubble-text: #ecdcaa;
@@ -75,15 +68,9 @@
       transition: background 0.3s, color 0.3s;
     }
 
-    .container {
-      max-width: 850px;
-      margin: 0 auto;
-    }
+    .container { max-width: 850px; margin: 0 auto; }
 
-    .top-bar {
-      text-align: right;
-      margin-bottom: 5px;
-    }
+    .top-bar { text-align: right; margin-bottom: 5px; }
     .top-bar button {
       background: transparent;
       border: 1px solid var(--panel-border);
@@ -93,13 +80,10 @@
       font-size: 14px;
       cursor: pointer;
       transition: background 0.2s, color 0.2s;
+      margin-left: 6px;
     }
-    .top-bar button:hover {
-      background: var(--panel-header-bg-2);
-      color: #ffffff;
-    }
+    .top-bar button:hover { background: var(--panel-header-bg-2); color: #ffffff; }
 
-    /* ---------- LOGO ROW (bubble + logo) ---------- */
     .logo-row {
       display: flex;
       align-items: center;
@@ -107,7 +91,6 @@
       gap: 15px;
       margin: 0 auto 20px;
     }
-
     .speech-bubble {
       position: relative;
       max-width: 240px;
@@ -121,15 +104,12 @@
       box-shadow: 0 2px 6px var(--bubble-shadow);
       transition: background 0.3s, color 0.3s, border-color 0.3s;
     }
-    /* Tail pointing right toward the logo */
     .speech-bubble::after {
       content: '';
       position: absolute;
-      right: -10px;
-      top: 50%;
+      right: -10px; top: 50%;
       transform: translateY(-50%);
-      width: 0;
-      height: 0;
+      width: 0; height: 0;
       border-top: 8px solid transparent;
       border-bottom: 8px solid transparent;
       border-left: 10px solid var(--bubble-border);
@@ -137,17 +117,14 @@
     .speech-bubble::before {
       content: '';
       position: absolute;
-      right: -8px;
-      top: 50%;
+      right: -8px; top: 50%;
       transform: translateY(-50%);
-      width: 0;
-      height: 0;
+      width: 0; height: 0;
       border-top: 7px solid transparent;
       border-bottom: 7px solid transparent;
       border-left: 9px solid var(--bubble-bg);
       z-index: 1;
     }
-
     .logo {
       display: block;
       width: 154px;
@@ -158,7 +135,6 @@
       flex-shrink: 0;
     }
 
-    /* ---------- CONTROL ROW ---------- */
     .controls {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
@@ -168,32 +144,21 @@
       margin: 0 auto 20px auto;
       max-width: 500px;
     }
-    .sprite-left {
+    .sprite-left, .sprite-right {
       height: 60px;
       width: auto;
       image-rendering: pixelated;
       filter: var(--sprite-filter);
-      transform: scaleX(-1);
-      justify-self: end;
     }
-    .sprite-right {
-      height: 60px;
-      width: auto;
-      image-rendering: pixelated;
-      filter: var(--sprite-filter);
-      justify-self: start;
-    }
+    .sprite-left { transform: scaleX(-1); justify-self: end; }
+    .sprite-right { justify-self: start; }
     .select-group {
       display: flex;
       align-items: center;
       gap: 8px;
       white-space: nowrap;
     }
-    .select-group label {
-      font-weight: bold;
-      color: var(--label-color);
-      margin: 0;
-    }
+    .select-group label { font-weight: bold; color: var(--label-color); margin: 0; }
     .select-group select {
       padding: 6px 10px;
       font-size: 16px;
@@ -204,7 +169,6 @@
       cursor: pointer;
     }
 
-    /* ---------- PANEL ---------- */
     .panel {
       border: 1px solid var(--panel-border);
       border-radius: 6px;
@@ -228,11 +192,8 @@
       flex-wrap: wrap;
       min-height: 42px;
     }
-    .panel-title {
-      white-space: nowrap;
-    }
+    .panel-title { white-space: nowrap; }
 
-    /* ---------- SKILL SELECTOR ---------- */
     .skill-selector {
       display: flex;
       align-items: center;
@@ -242,18 +203,13 @@
       letter-spacing: normal;
       text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
     }
-    .skill-selector.hidden {
-      display: none;
-    }
+    .skill-selector.hidden { display: none; }
     .skill-selector img {
-      width: 24px;
-      height: 24px;
+      width: 24px; height: 24px;
       image-rendering: pixelated;
       filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3));
     }
-    .skill-selector .skill-name {
-      color: #ffffff;
-    }
+    .skill-selector .skill-name { color: #ffffff; }
     .skill-selector select {
       padding: 2px 4px;
       font-size: 12px;
@@ -265,12 +221,8 @@
       font-weight: bold;
     }
 
-    .panel-body {
-      background: var(--panel-body-bg);
-      padding: 16px 18px;
-    }
+    .panel-body { background: var(--panel-body-bg); padding: 16px 18px; }
 
-    /* ---------- STAT ROWS ---------- */
     .stat-row {
       display: flex;
       align-items: center;
@@ -298,12 +250,7 @@
       background: var(--bar-container-bg);
     }
 
-    /* ---------- BAR WRAPPER ---------- */
-    .bar-wrapper {
-      flex-grow: 1;
-      min-width: 80px;
-      margin: 0 10px;
-    }
+    .bar-wrapper { flex-grow: 1; min-width: 80px; margin: 0 10px; }
     .bar-labels {
       display: flex;
       justify-content: space-between;
@@ -347,16 +294,13 @@
     }
     .avg-line {
       position: absolute;
-      left: 50%;
-      top: 0;
-      bottom: 0;
+      left: 50%; top: 0; bottom: 0;
       width: 1px;
       background: var(--avg-line-color);
       transform: translateX(-50%);
       z-index: 2;
       pointer-events: none;
     }
-
     .percent {
       width: 55px;
       text-align: right;
@@ -364,82 +308,299 @@
       font-size: 14px;
       color: var(--percent-color);
     }
-    .percent-spacer {
-      width: 55px;
+    .percent-spacer { width: 55px; }
+    .stat-row.level-row .stat-label { color: var(--label-color); }
+
+    /* ---------- OCR MODAL ---------- */
+    .ocr-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 12px;
     }
-    .stat-row.level-row .stat-label {
+    .ocr-modal.hidden { display: none; }
+    .ocr-content {
+      background: var(--panel-body-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      max-width: 640px;
+      width: 100%;
+      max-height: 94vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+    }
+    .ocr-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      background: linear-gradient(to bottom, var(--panel-header-bg-1), var(--panel-header-bg-2));
+      color: #fff;
+      font-weight: bold;
+      font-size: 16px;
+      text-shadow: 1px 1px 2px var(--panel-header-text-shadow);
+      flex-shrink: 0;
+    }
+    .ocr-close {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 0 8px;
+      line-height: 1;
+      font-weight: bold;
+    }
+    .ocr-close:hover { opacity: 0.75; }
+    .ocr-body { padding: 14px; }
+
+    .ocr-type-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .ocr-type-row label {
+      font-size: 13px;
+      font-weight: bold;
       color: var(--label-color);
     }
+    .ocr-type-row select {
+      padding: 5px 8px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: 1px solid var(--select-border);
+      background: var(--select-bg);
+      color: var(--select-text);
+      cursor: pointer;
+      min-width: 140px;
+    }
 
-    /* ---------- MOBILE ---------- */
+    .ocr-hint {
+      font-size: 13px;
+      color: var(--label-color);
+      margin: 0 0 10px;
+      line-height: 1.45;
+    }
+    .ocr-hint strong { color: var(--text-color); }
+
+    .ocr-file-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px dashed var(--input-border);
+      border-radius: 4px;
+      background: var(--input-bg);
+      color: var(--text-color);
+      cursor: pointer;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .mask-viewport {
+      position: relative;
+      width: 390px;
+      max-width: 100%;
+      aspect-ratio: 390 / 300;
+      background: #15191a;
+      border: 2px solid var(--panel-border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 0 auto 8px;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      background-image:
+        linear-gradient(45deg, rgba(255,255,255,0.03) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255,255,255,0.03) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.03) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.03) 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    }
+    .mask-viewport.dragging { cursor: grabbing; }
+    .mask-viewport canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .mask-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6b8f8c;
+      font-size: 13px;
+      pointer-events: none;
+      text-align: center;
+      padding: 20px;
+    }
+    .mask-placeholder.hidden { display: none; }
+
+    .mask-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: var(--label-color);
+    }
+    .mask-controls label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+    .mask-controls input[type=range] {
+      flex: 1;
+      accent-color: var(--panel-header-bg-2);
+    }
+    .mask-controls button {
+      padding: 4px 12px;
+      font-size: 12px;
+      border-radius: 4px;
+      border: 1px solid var(--panel-border);
+      background: transparent;
+      color: var(--text-color);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .mask-controls button:hover {
+      background: var(--panel-header-bg-2);
+      color: #fff;
+    }
+
+    .ocr-status {
+      font-size: 13px;
+      color: var(--label-color);
+      min-height: 20px;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+    .ocr-status.success { color: #2e7d32; font-weight: bold; }
+    .ocr-status.error { color: #d32f2f; font-weight: bold; }
+    .ocr-status.progress {
+      background: linear-gradient(90deg, transparent, var(--panel-header-bg-2), transparent);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: sweep 1.4s linear infinite;
+    }
+    @keyframes sweep {
+      0% { background-position: 100% 0; }
+      100% { background-position: -100% 0; }
+    }
+
+    /* NEW: OCR warnings line */
+    .ocr-warnings {
+      display: none;
+      font-size: 13px;
+      font-weight: bold;
+      color: #d32f2f;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+    .ocr-warnings.visible { display: block; }
+
+    .ocr-raw {
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+    .ocr-raw summary {
+      cursor: pointer;
+      color: var(--label-color);
+      font-weight: bold;
+      padding: 4px 0;
+      user-select: none;
+    }
+    .ocr-raw summary:hover { color: var(--text-color); }
+    .ocr-raw pre {
+      background: var(--bar-container-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 4px;
+      padding: 8px;
+      font-size: 11px;
+      max-height: 160px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin: 6px 0 0;
+      color: var(--text-color);
+      font-family: monospace;
+    }
+
+    .ocr-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .ocr-actions button {
+      padding: 6px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      border: 1px solid var(--panel-border);
+      background: transparent;
+      color: var(--text-color);
+      transition: background 0.2s, color 0.2s;
+    }
+    .ocr-actions button:hover:not(:disabled) {
+      background: var(--panel-header-bg-2);
+      color: #fff;
+    }
+    .ocr-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .ocr-actions button.primary {
+      background: var(--panel-header-bg-2);
+      color: #fff;
+      border-color: var(--panel-header-bg-2);
+      font-weight: bold;
+    }
+    .ocr-actions button.primary:hover:not(:disabled) { filter: brightness(1.1); }
+
     @media (max-width: 600px) {
-      .logo-row {
-        flex-direction: column;
-        gap: 12px;
-      }
-      .speech-bubble {
-        max-width: 100%;
-        order: 2; /* place bubble below logo on mobile */
-      }
-      .speech-bubble::after,
-      .speech-bubble::before {
-        display: none; /* hide tail when stacked */
-      }
-      .controls {
-        display: flex;
-        flex-direction: column;
-        max-width: none;
-        gap: 8px;
-      }
-      .sprite-left, .sprite-right {
-        justify-self: auto;
-      }
-      .sprite-left {
-        transform: scaleX(-1);
-      }
-      .panel-header {
-        font-size: 16px;
-        min-height: 42px;
-      }
-      .skill-selector {
-        font-size: 11px;
-      }
-      .skill-selector img {
-        width: 20px;
-        height: 20px;
-      }
-      .skill-selector .skill-name {
-        display: none; /* save space on mobile */
-      }
-      .stat-row {
-        flex-direction: column;
-        align-items: flex-start;
-        margin-bottom: 12px;
-      }
-      .stat-input {
-        width: 100%;
-        max-width: 120px;
-      }
-      .bar-wrapper {
-        width: 100%;
-        margin: 6px 0;
-      }
-      .percent, .percent-spacer {
-        width: auto;
-        text-align: left;
-      }
+      .logo-row { flex-direction: column; gap: 12px; }
+      .speech-bubble { max-width: 100%; order: 2; }
+      .speech-bubble::after, .speech-bubble::before { display: none; }
+      .controls { display: flex; flex-direction: column; max-width: none; gap: 8px; }
+      .sprite-left, .sprite-right { justify-self: auto; }
+      .sprite-left { transform: scaleX(-1); }
+      .panel-header { font-size: 16px; min-height: 42px; }
+      .skill-selector { font-size: 11px; }
+      .skill-selector img { width: 20px; height: 20px; }
+      .skill-selector .skill-name { display: none; }
+      .stat-row { flex-direction: column; align-items: flex-start; margin-bottom: 12px; }
+      .stat-input { width: 100%; max-width: 120px; }
+      .bar-wrapper { width: 100%; margin: 6px 0; }
+      .percent, .percent-spacer { width: auto; text-align: left; }
+      .top-bar button { font-size: 12px; padding: 5px 10px; }
+      .mask-viewport { width: 100%; }
     }
   </style>
 </head>
-<body>
+<body class="dark">
+  <script>
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.remove('dark');
+    }
+  </script>
+
   <div class="container">
     <div class="top-bar">
-      <button id="themeToggle">🌙 Dark Mode</button>
+      <button id="ocrToggle">📷 Load Screenshot</button>
+      <button id="themeToggle">☀️Mode</button>
     </div>
 
     <div class="logo-row">
       <div class="speech-bubble">
         fellow alchemist~ all values are based on empirical data and percentile calculation. no data mining so some inaccuracies may occur.
+        The OCR will be wonky, but if you are lazy it can do a lot of work for you.
       </div>
       <img src="./resources/xiaomao.png" alt="Xiaomao Homunculus Calculator" class="logo">
     </div>
@@ -450,7 +611,7 @@
         <label for="homunculusType">Select Homunculus:</label>
         <select id="homunculusType">
           <option value="Amistr">Amistr</option>
-          <option value="Filir">Filir(WIP)</option>
+          <option value="Filir">Filir</option>
           <option value="Lif">Lif</option>
           <option value="Vanilmirth">Vanilmirth</option>
         </select>
@@ -460,7 +621,7 @@
 
     <div class="panel">
       <div class="panel-header">
-        <span class="panel-title">Xiaomao’s Homunculus Calculation</span>
+        <span class="panel-title">Xiaomao's Homunculus Calculation</span>
         <div class="skill-selector hidden" id="skillSelector">
           <img id="skillIcon" src="" alt="Skill">
           <span class="skill-name" id="skillName">Skill</span>
@@ -474,8 +635,51 @@
           </select>
         </div>
       </div>
-      <div class="panel-body" id="statsContainer">
-        <!-- Dynamically generated stat rows -->
+      <div class="panel-body" id="statsContainer"></div>
+    </div>
+  </div>
+
+  <!-- ---------- OCR MODAL (MASK-BASED) ---------- -->
+  <div class="ocr-modal hidden" id="ocrModal">
+    <div class="ocr-content">
+      <div class="ocr-header">
+        <span>📷 Load from Screenshot</span>
+        <button class="ocr-close" id="ocrClose" aria-label="Close">✕</button>
+      </div>
+      <div class="ocr-body">
+
+        <div class="ocr-type-row">
+          <label for="ocrHomunculusType">Homunculus:</label>
+          <select id="ocrHomunculusType">
+            <option value="Amistr">Amistr</option>
+            <option value="Filir">Filir</option>
+            <option value="Lif">Lif</option>
+            <option value="Vanilmirth">Vanilmirth</option>
+          </select>
+        </div>
+
+        <p class="ocr-hint">
+          Load your Homunculus screenshot, then <strong>drag</strong> and <strong>zoom</strong> it until each number sits inside its red dashed box. Then click <strong>Read Values</strong>.
+        </p>
+        <input type="file" id="imageInput" accept="image/*" class="ocr-file-input">
+        <div class="mask-viewport" id="maskViewport">
+          <canvas id="maskCanvas" width="390" height="300"></canvas>
+          <div class="mask-placeholder" id="maskPlaceholder">Load a screenshot to begin</div>
+        </div>
+        <div class="mask-controls" id="maskControls" style="display:none;">
+          <label>Zoom: <input type="range" id="zoomSlider" min="0.15" max="4" step="0.01" value="1"></label>
+          <button type="button" id="resetFitBtn">Reset Fit</button>
+        </div>
+        <div class="ocr-status" id="ocrStatus"></div>
+        <div class="ocr-warnings" id="ocrWarnings"></div>
+        <details class="ocr-raw" id="rawTextWrap" style="display:none;">
+          <summary>Show raw OCR text per field (for debugging)</summary>
+          <pre id="rawText"></pre>
+        </details>
+        <div class="ocr-actions">
+          <button id="ocrCancelBtn">Cancel</button>
+          <button id="readValuesBtn" class="primary" disabled>Read Values</button>
+        </div>
       </div>
     </div>
   </div>
@@ -506,31 +710,12 @@
     };
 
     const sprites = {
-      // WIP
-      Amistr: {
-        type1: './resources/Amistr.png',
-        type2: './resources/Amistr2.png'
-      },
-      // WIP
-      Filir: {
-        type1: './resources/Filir.png',
-        type2: './resources/Filir2.png'
-      },
-      Lif: {
-        type1: './resources/Lif.png',
-        type2: './resources/Lif2.png'
-      },
-      Vanilmirth: {
-        type1: './resources/Vanilmirth.png',
-        type2: './resources/Vanilmirth2.png'
-      }
+      Amistr: { type1: './resources/Amistr.png', type2: './resources/Amistr2.png' },
+      Filir: { type1: './resources/Filir.png', type2: './resources/Filir2.png' },
+      Lif: { type1: './resources/Lif.png', type2: './resources/Lif2.png' },
+      Vanilmirth: { type1: './resources/Vanilmirth.png', type2: './resources/Vanilmirth2.png' }
     };
 
-    // ---------- SKILL DATA ----------
-    // Each skill defines the effect of levels 0–5 on one or more stats.
-    //   kind: 'percent'  -> value / (1 + bonus/100)  (removes the skill bonus)
-    //   kind: 'flat'     -> value - bonus            (removes the skill bonus)
-    // Filir has no skill (undefined entry = selector hidden).
     const skillData = {
       Amistr: {
         name: 'Adamantium Skin',
@@ -560,16 +745,29 @@
 
     const statKeys = ['HP', 'SP', 'ATK', 'MATK', 'HIT', 'CRITICAL', 'DEF', 'MDEF', 'FLEE', 'ASPD'];
     const statLabels = {
-      HP: 'HP',
-      SP: 'SP',
-      ATK: 'ATK',
-      MATK: 'MATK',
-      HIT: 'HIT',
-      CRITICAL: 'CRITICAL',
-      DEF: 'DEF',
-      MDEF: 'MDEF',
-      FLEE: 'FLEE',
-      ASPD: 'ASPD'
+      HP: 'HP', SP: 'SP', ATK: 'ATK', MATK: 'MATK', HIT: 'HIT',
+      CRITICAL: 'CRITICAL', DEF: 'DEF', MDEF: 'MDEF', FLEE: 'FLEE', ASPD: 'ASPD'
+    };
+
+    // ---------- MASK REGIONS ----------
+    const MASK_REGIONS = {
+      ATK:      { label: 'Atk',  read: { x: 0.175, y: 0.170, w: 0.120, h: 0.070 } },
+      MATK:     { label: 'Matk', read: { x: 0.175, y: 0.250, w: 0.120, h: 0.070 } },
+      HIT:      { label: 'Hit',  read: { x: 0.175, y: 0.330, w: 0.120, h: 0.070 } },
+      CRITICAL: {
+        label: 'Crit',
+        read:   { x: 0.205, y: 0.410, w: 0.135, h: 0.070 },
+        visual: { x: 0.175, y: 0.410, w: 0.120, h: 0.070 }
+      },
+      DEF:      { label: 'Def',  read: { x: 0.175, y: 0.490, w: 0.120, h: 0.070 } },
+      MDEF:     { label: 'Mdef', read: { x: 0.175, y: 0.570, w: 0.120, h: 0.070 } },
+      FLEE:     { label: 'Flee', read: { x: 0.175, y: 0.650, w: 0.120, h: 0.070 } },
+      ASPD:     { label: 'Aspd', read: { x: 0.175, y: 0.730, w: 0.120, h: 0.070 } },
+
+      LVL:      { label: 'Lvl',  read: { x: 0.435, y: 0.265, w: 0.100, h: 0.070 } },
+
+      HP:       { label: 'HP',   read: { x: 0.695, y: 0.375, w: 0.140, h: 0.070 } },
+      SP:       { label: 'SP',   read: { x: 0.695, y: 0.445, w: 0.140, h: 0.070 } }
     };
 
     // ---------- STATISTICAL HELPERS ----------
@@ -580,6 +778,7 @@
       return z > 0 ? 1 - p : p;
     }
 
+    // ---------- APP STATE ----------
     let currentType = 'Amistr';
     let currentData = homunculusData[currentType];
     let currentSkillLevel = 0;
@@ -593,7 +792,6 @@
     const skillName = document.getElementById('skillName');
     const skillLevelSelect = document.getElementById('skillLevel');
 
-    // ---------- BUILD UI ----------
     function buildStatsUI() {
       statsContainer.innerHTML = '';
 
@@ -633,7 +831,6 @@
       });
     }
 
-    // ---------- RESET INPUTS ----------
     function resetInputs() {
       const levelInput = document.getElementById('input-LVL');
       levelInput.value = 1;
@@ -644,7 +841,6 @@
       updateAll();
     }
 
-    // ---------- SKILL SELECTOR ----------
     function updateSkillSelector() {
       const skill = skillData[currentType];
       if (!skill) {
@@ -659,10 +855,6 @@
       currentSkillLevel = 0;
     }
 
-    // ---------- CALCULATIONS ----------
-    // Bar position = actual percentile of the entered value.
-    // Skill bonuses are removed from the entered value before the percentile
-    // is computed, so the bar reflects the *base* stat distribution.
     function updateAll() {
       const levelInput = document.getElementById('input-LVL');
       let level = parseInt(levelInput.value);
@@ -686,7 +878,6 @@
         let value = parseFloat(input.value);
         if (isNaN(value)) value = 0;
 
-        // Strip out the skill's contribution to this stat (if any)
         let adjustedValue = value;
         const eff = effects[key];
         if (eff) {
@@ -725,18 +916,13 @@
         }
 
         let label;
-        if (percentile < 1) {
-          label = '<1%';
-        } else if (percentile > 99) {
-          label = '>99%';
-        } else {
-          label = Math.round(percentile) + '%';
-        }
+        if (percentile < 1) label = '<1%';
+        else if (percentile > 99) label = '>99%';
+        else label = Math.round(percentile) + '%';
         document.getElementById(`percent-${key}`).textContent = label;
       });
     }
 
-    // ---------- TYPE CHANGE ----------
     function updateType() {
       currentType = select.value;
       currentData = homunculusData[currentType];
@@ -746,47 +932,437 @@
 
       updateSkillSelector();
       resetInputs();
-
-      // Lock all input fields for WIP homunculi (Filir)
-      const locked = currentType === 'Filir';
-      statsContainer.querySelectorAll('.stat-input').forEach(el => el.disabled = locked);
     }
 
-    // ---------- INITIALIZATION ----------
     buildStatsUI();
     updateType();
 
     select.addEventListener('change', updateType);
 
-    // Skill level change -> recompute
     skillLevelSelect.addEventListener('change', () => {
       currentSkillLevel = parseInt(skillLevelSelect.value) || 0;
       updateAll();
     });
 
-    // ---------- DARK MODE TOGGLE ----------
+    // ---------- DARK MODE ----------
     const themeToggle = document.getElementById('themeToggle');
-
     function applyTheme(dark) {
       if (dark) {
         document.body.classList.add('dark');
-        themeToggle.textContent = '☀️ Light Mode';
+        themeToggle.textContent = '☀️Mode';
       } else {
         document.body.classList.remove('dark');
-        themeToggle.textContent = '🌙 Dark Mode';
+        themeToggle.textContent = '🌙Mode';
       }
     }
-
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      applyTheme(true);
-    }
+    if (localStorage.getItem('theme') === 'light') applyTheme(false);
+    else applyTheme(true);
 
     themeToggle.addEventListener('click', () => {
       const isDark = document.body.classList.contains('dark');
       applyTheme(!isDark);
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      localStorage.setItem('theme', isDark ? 'light' : 'dark');
     });
+
+    // ================================================================
+    //  MASK-BASED OCR
+    // ================================================================
+    const ocrToggle = document.getElementById('ocrToggle');
+    const ocrModal = document.getElementById('ocrModal');
+    const ocrClose = document.getElementById('ocrClose');
+    const ocrCancelBtn = document.getElementById('ocrCancelBtn');
+    const imageInput = document.getElementById('imageInput');
+    const maskViewport = document.getElementById('maskViewport');
+    const maskCanvas = document.getElementById('maskCanvas');
+    const maskPlaceholder = document.getElementById('maskPlaceholder');
+    const maskControls = document.getElementById('maskControls');
+    const zoomSlider = document.getElementById('zoomSlider');
+    const resetFitBtn = document.getElementById('resetFitBtn');
+    const ocrStatus = document.getElementById('ocrStatus');
+    const ocrWarnings = document.getElementById('ocrWarnings');
+    const rawTextWrap = document.getElementById('rawTextWrap');
+    const rawTextBox = document.getElementById('rawText');
+    const readValuesBtn = document.getElementById('readValuesBtn');
+    const ocrHomunculusType = document.getElementById('ocrHomunculusType');
+
+    const MASK_W = 390;
+    const MASK_H = 300;
+    const OCR_UPSCALE = 4;
+
+    let uploadedImageEl = null;
+    let imgX = 0, imgY = 0, imgScale = 1;
+    let tesseractLoadPromise = null;
+
+    function loadTesseract() {
+      if (window.Tesseract) return Promise.resolve();
+      if (tesseractLoadPromise) return tesseractLoadPromise;
+      tesseractLoadPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Failed to load Tesseract.js from CDN'));
+        document.head.appendChild(script);
+      });
+      return tesseractLoadPromise;
+    }
+
+    function openOcrModal() {
+      ocrHomunculusType.value = select.value;
+      ocrModal.classList.remove('hidden');
+    }
+    function closeOcrModal() { ocrModal.classList.add('hidden'); }
+
+    ocrToggle.addEventListener('click', openOcrModal);
+    ocrClose.addEventListener('click', closeOcrModal);
+    ocrCancelBtn.addEventListener('click', closeOcrModal);
+    ocrModal.addEventListener('click', (e) => {
+      if (e.target === ocrModal) closeOcrModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !ocrModal.classList.contains('hidden')) closeOcrModal();
+    });
+
+    ocrHomunculusType.addEventListener('change', () => {
+      const newType = ocrHomunculusType.value;
+      if (select.value !== newType) {
+        select.value = newType;
+        updateType();
+      }
+    });
+
+    select.addEventListener('change', () => {
+      if (!ocrModal.classList.contains('hidden')) {
+        ocrHomunculusType.value = select.value;
+      }
+    });
+
+    // ---------- DRAW THE MASK ----------
+    function redrawMask() {
+      const ctx = maskCanvas.getContext('2d');
+      ctx.clearRect(0, 0, MASK_W, MASK_H);
+
+      if (uploadedImageEl) {
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        const w = uploadedImageEl.naturalWidth * imgScale;
+        const h = uploadedImageEl.naturalHeight * imgScale;
+        ctx.drawImage(uploadedImageEl, imgX, imgY, w, h);
+      }
+
+      ctx.save();
+      ctx.setLineDash([4, 3]);
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = '#ff2d2d';
+      ctx.shadowColor = 'rgba(0,0,0,0.85)';
+      ctx.shadowBlur = 2;
+
+      for (const key in MASK_REGIONS) {
+        const r = MASK_REGIONS[key];
+        const box = r.visual || r.read;
+        const x = box.x * MASK_W;
+        const y = box.y * MASK_H;
+        const w = box.w * MASK_W;
+        const h = box.h * MASK_H;
+
+        ctx.fillStyle = 'rgba(0,0,0,0.10)';
+        ctx.fillRect(x, y, w, h);
+        ctx.strokeRect(x, y, w, h);
+      }
+      ctx.restore();
+    }
+
+    function fitImageToMask() {
+      if (!uploadedImageEl) return;
+      const iw = uploadedImageEl.naturalWidth;
+      const ih = uploadedImageEl.naturalHeight;
+      const s = Math.min(MASK_W / iw, MASK_H / ih) * 0.95;
+      imgScale = s;
+      imgX = (MASK_W - iw * s) / 2;
+      imgY = (MASK_H - ih * s) / 2;
+      zoomSlider.value = s;
+      redrawMask();
+    }
+
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          uploadedImageEl = img;
+          maskPlaceholder.classList.add('hidden');
+          maskControls.style.display = 'flex';
+          fitImageToMask();
+          ocrStatus.className = 'ocr-status';
+          ocrStatus.textContent = `Loaded ${img.naturalWidth}×${img.naturalHeight}. Align each number inside its red box, then click "Read Values".`;
+          hideOcrWarnings();
+          readValuesBtn.disabled = false;
+          if (rawTextWrap) rawTextWrap.style.display = 'none';
+          if (rawTextBox) rawTextBox.textContent = '';
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // ---------- DRAG TO PAN ----------
+    let isDragging = false;
+    let dragStartCanvasX = 0, dragStartCanvasY = 0;
+    let dragStartImgX = 0, dragStartImgY = 0;
+
+    function pointerToCanvas(e) {
+      const rect = maskCanvas.getBoundingClientRect();
+      return {
+        x: (e.clientX - rect.left) * (MASK_W / rect.width),
+        y: (e.clientY - rect.top) * (MASK_H / rect.height)
+      };
+    }
+
+    maskViewport.addEventListener('pointerdown', (e) => {
+      if (!uploadedImageEl) return;
+      const p = pointerToCanvas(e);
+      if (p.x < 0 || p.y < 0 || p.x > MASK_W || p.y > MASK_H) return;
+      isDragging = true;
+      maskViewport.classList.add('dragging');
+      maskViewport.setPointerCapture(e.pointerId);
+      dragStartCanvasX = p.x;
+      dragStartCanvasY = p.y;
+      dragStartImgX = imgX;
+      dragStartImgY = imgY;
+      e.preventDefault();
+    });
+
+    maskViewport.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      const p = pointerToCanvas(e);
+      imgX = dragStartImgX + (p.x - dragStartCanvasX);
+      imgY = dragStartImgY + (p.y - dragStartCanvasY);
+      redrawMask();
+    });
+
+    function endDrag(e) {
+      if (!isDragging) return;
+      isDragging = false;
+      maskViewport.classList.remove('dragging');
+      try { maskViewport.releasePointerCapture(e.pointerId); } catch (_) {}
+    }
+    maskViewport.addEventListener('pointerup', endDrag);
+    maskViewport.addEventListener('pointercancel', endDrag);
+
+    zoomSlider.addEventListener('input', () => {
+      if (!uploadedImageEl) return;
+      const newScale = parseFloat(zoomSlider.value);
+      const cx = MASK_W / 2;
+      const cy = MASK_H / 2;
+      const px = (cx - imgX) / imgScale;
+      const py = (cy - imgY) / imgScale;
+      imgScale = newScale;
+      imgX = cx - px * imgScale;
+      imgY = cy - py * imgScale;
+      redrawMask();
+    });
+
+    resetFitBtn.addEventListener('click', () => {
+      fitImageToMask();
+    });
+
+    // ---------- CROP A REGION FOR OCR ----------
+    function cropRegion(region) {
+      const r = region.read;
+      const rx = r.x * MASK_W;
+      const ry = r.y * MASK_H;
+      const rw = r.w * MASK_W;
+      const rh = r.h * MASK_H;
+
+      const sx = (rx - imgX) / imgScale;
+      const sy = (ry - imgY) / imgScale;
+      const sw = rw / imgScale;
+      const sh = rh / imgScale;
+
+      const dstW = Math.max(20, Math.round(rw * OCR_UPSCALE));
+      const dstH = Math.max(12, Math.round(rh * OCR_UPSCALE));
+
+      const c = document.createElement('canvas');
+      c.width = dstW;
+      c.height = dstH;
+      const ctx = c.getContext('2d');
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, dstW, dstH);
+
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(uploadedImageEl, sx, sy, sw, sh, 0, 0, dstW, dstH);
+
+      // Contrast boost + threshold-ish
+      const id = ctx.getImageData(0, 0, dstW, dstH);
+      const d = id.data;
+      const CONTRAST = 2.8;
+      const BRIGHTNESS = 20;
+      const THRESHOLD = 128;
+
+      for (let i = 0; i < d.length; i += 4) {
+        const gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+        let boosted = (gray - 128) * CONTRAST + 128 + BRIGHTNESS;
+        let out;
+        if (boosted < THRESHOLD) out = 0;
+        else out = 255;
+        d[i] = d[i + 1] = d[i + 2] = out;
+      }
+      ctx.putImageData(id, 0, 0);
+
+      return c;
+    }
+
+    // ---------- OCR WARNINGS HELPERS ----------
+    function hideOcrWarnings() {
+      ocrWarnings.classList.remove('visible');
+      ocrWarnings.textContent = '';
+    }
+
+    // Fields that are allowed to have a single digit value
+    const SINGLE_DIGIT_OK = new Set(['CRITICAL', 'LVL']);
+
+    // Detect fields whose OCR result looks suspicious:
+    //   • empty (no digits detected)
+    //   • starts with "0" (likely a dropped leading digit)
+    //   • single digit for stats that should have at least two (all but CRIT & LVL)
+    function collectOcrProblems(results) {
+      const problems = [];
+      const order = Object.keys(MASK_REGIONS);
+      for (const key of order) {
+        const r = results[key];
+        if (!r) continue;
+        const digits = (r.raw || '').replace(/\D/g, '');
+
+        if (digits.length === 0) {
+          problems.push({ key, reason: 'empty' });
+          continue;
+        }
+        if (digits.startsWith('0')) {
+          problems.push({ key, reason: 'leading-zero' });
+          continue;
+        }
+        if (digits.length === 1 && !SINGLE_DIGIT_OK.has(key)) {
+          problems.push({ key, reason: 'single-digit' });
+        }
+      }
+      return problems;
+    }
+
+    function showOcrWarnings(problems) {
+      if (problems.length === 0) {
+        hideOcrWarnings();
+        return;
+      }
+      const names = problems.map(p => p.key).join(', ');
+      ocrWarnings.textContent = 'OCR Problems with: ' + names;
+      ocrWarnings.classList.add('visible');
+    }
+
+    // ---------- READ VALUES ----------
+    readValuesBtn.addEventListener('click', async () => {
+      if (!uploadedImageEl) return;
+      readValuesBtn.disabled = true;
+      hideOcrWarnings();
+      ocrStatus.className = 'ocr-status';
+      ocrStatus.textContent = 'Loading OCR engine (first run downloads ~10 MB)...';
+
+      try {
+        await loadTesseract();
+
+        const worker = await Tesseract.createWorker('eng', 1, {
+          logger: (m) => {
+            if (m.status && m.status !== 'loading tesseract core' && m.status !== 'recognizing text') {
+              ocrStatus.textContent = m.status.replace(/_/g, ' ') + '...';
+            }
+          }
+        });
+
+        await worker.setParameters({
+          tessedit_char_whitelist: '0123456789',
+          tessedit_pageseg_mode: '7'
+        });
+
+        const results = {};
+        const order = Object.keys(MASK_REGIONS);
+
+        for (let i = 0; i < order.length; i++) {
+          const key = order[i];
+          const region = MASK_REGIONS[key];
+          ocrStatus.className = 'ocr-status progress';
+          ocrStatus.textContent = `Reading ${region.label}… (${i + 1}/${order.length})`;
+
+          const crop = cropRegion(region);
+          let rawText = '';
+          try {
+            const { data: { text } } = await worker.recognize(crop);
+            rawText = (text || '').trim();
+          } catch (err) {
+            console.error('OCR error on', key, err);
+          }
+          const digits = rawText.replace(/\D/g, '');
+          const value = digits ? parseInt(digits, 10) : null;
+          results[key] = { raw: rawText, value };
+        }
+
+        await worker.terminate();
+
+        let filled = 0;
+
+        if (results.LVL && results.LVL.value !== null && !isNaN(results.LVL.value)) {
+          const levelInput = document.getElementById('input-LVL');
+          if (levelInput) {
+            levelInput.value = Math.min(60, Math.max(1, results.LVL.value));
+            filled++;
+          }
+        }
+
+        ['HP', 'SP', 'ATK', 'MATK', 'HIT', 'CRITICAL', 'DEF', 'MDEF', 'FLEE', 'ASPD'].forEach(key => {
+          const r = results[key];
+          if (r && r.value !== null && !isNaN(r.value)) {
+            const input = document.getElementById(`input-${key}`);
+            if (input) {
+              input.value = r.value;
+              filled++;
+            }
+          }
+        });
+
+        updateAll();
+
+        const debugLines = order
+          .filter(k => results[k])
+          .map(k => {
+            const v = results[k].value;
+            const r = results[k].raw || '(empty)';
+            return `${k.padEnd(9)} → ${v !== null ? v : '?'}    [raw: "${r}"]`;
+          });
+        if (rawTextBox) rawTextBox.textContent = debugLines.join('\n');
+        if (rawTextWrap) rawTextWrap.style.display = 'block';
+
+        // Suspicious-value warnings
+        const problems = collectOcrProblems(results);
+        showOcrWarnings(problems);
+
+        if (filled === 0) {
+          ocrStatus.className = 'ocr-status error';
+          ocrStatus.textContent = 'No values detected. Try zooming/aligning the image more precisely.';
+        } else {
+          ocrStatus.className = 'ocr-status success';
+          ocrStatus.textContent = `✓ Filled ${filled} field${filled === 1 ? '' : 's'}. Close and verify the values.`;
+        }
+      } catch (err) {
+        console.error(err);
+        ocrStatus.className = 'ocr-status error';
+        ocrStatus.textContent = 'OCR failed: ' + err.message;
+      } finally {
+        readValuesBtn.disabled = false;
+      }
+    });
+
+    redrawMask();
   </script>
 </body>
 </html>
