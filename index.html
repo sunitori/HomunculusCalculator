@@ -769,7 +769,6 @@
       Vanilmirth: 'https://docs.google.com/forms/d/e/1FAIpQLSdGARPLc0MxyvvlGdWVK4ns_sA5AePSQihsV1x_gZu0wakZ0w/formResponse'
     };
 
-    // Entry IDs — identical across all four forms since they were cloned
     const GOOGLE_FORM_FIELDS = {
       level:      'entry.1727174717',
       skillLevel: 'entry.1189504408',
@@ -1078,6 +1077,9 @@
     }
 
     // ---------- GOOGLE FORMS SUBMISSION ----------
+    // Creates a real hidden <form> and submits it via POST into a hidden
+    // iframe. This is the pattern Google Forms actually expects: GET on
+    // /formResponse returns 401, but a native form POST goes through cleanly.
     async function submitData() {
       const action = GOOGLE_FORMS_ACTION[currentType];
       if (!action) {
@@ -1086,30 +1088,46 @@
       }
 
       const levelInput = document.getElementById('input-LVL');
-      const params = new URLSearchParams();
+      const iframeName = 'gform_target_' + Date.now() + '_' + Math.random().toString(36).slice(2);
 
-      params.append(GOOGLE_FORM_FIELDS.level, levelInput.value);
-      params.append(GOOGLE_FORM_FIELDS.skillLevel, currentSkillLevel);
+      // Hidden iframe that will receive Google's response page
+      const iframe = document.createElement('iframe');
+      iframe.name = iframeName;
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
 
+      // Build the form
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = action;
+      form.target = iframeName;
+      form.style.display = 'none';
+
+      const addField = (name, value) => {
+        if (!name) return;
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value == null ? '' : String(value);
+        form.appendChild(input);
+      };
+
+      addField(GOOGLE_FORM_FIELDS.level, levelInput.value);
+      addField(GOOGLE_FORM_FIELDS.skillLevel, currentSkillLevel);
       statKeys.forEach(key => {
-        const fieldId = GOOGLE_FORM_FIELDS[key];
-        if (fieldId) {
-          params.append(fieldId, document.getElementById(`input-${key}`).value);
-        }
+        addField(GOOGLE_FORM_FIELDS[key], document.getElementById(`input-${key}`).value);
       });
 
-      const url = `${action}?${params.toString()}`;
+      document.body.appendChild(form);
+      form.submit();
 
-      // Hidden-iframe submission — bypasses CORS, works on GitHub Pages
-      return new Promise((resolve) => {
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = url;
-        document.body.appendChild(iframe);
+      // Clean up after giving the request time to complete
+      return new Promise(resolve => {
         setTimeout(() => {
+          try { document.body.removeChild(form); } catch (_) {}
           try { document.body.removeChild(iframe); } catch (_) {}
           resolve({ ok: true });
-        }, 1200);
+        }, 1500);
       });
     }
 
@@ -1136,10 +1154,8 @@
 
     // ---------- CALCULATE BUTTON ----------
     calcBtn.addEventListener('click', async () => {
-      // Always compute and display — the user gets their answer regardless
       updateAll();
 
-      // Check daily submission cap
       const check = checkDailyLimit();
       if (check.blocked) {
         calcFeedback.textContent = `Daily limit reached (${DAILY_LIMIT}/day). Results shown, but this submission was not sent.`;
