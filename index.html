@@ -311,6 +311,46 @@
     .percent-spacer { width: 55px; }
     .stat-row.level-row .stat-label { color: var(--label-color); }
 
+    .calc-wrapper {
+      max-width: 700px;
+      margin: 14px auto 0;
+      text-align: center;
+    }
+    .calc-btn {
+      background: linear-gradient(to bottom, var(--panel-header-bg-1), var(--panel-header-bg-2));
+      color: #ffffff;
+      border: 1px solid var(--panel-header-bg-2);
+      border-radius: 6px;
+      padding: 12px 36px;
+      font-size: 16px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      text-shadow: 1px 1px 2px var(--panel-header-text-shadow);
+      box-shadow: 0 3px 8px var(--shadow-color);
+      transition: filter 0.15s, transform 0.1s;
+      min-width: 200px;
+    }
+    .calc-btn:hover { filter: brightness(1.08); }
+    .calc-btn:active { transform: translateY(1px); }
+    .calc-btn:disabled { opacity: 0.7; cursor: wait; }
+    .calc-note {
+      font-size: 11px;
+      color: var(--label-color);
+      opacity: 0.85;
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+    .calc-feedback {
+      font-size: 12px;
+      margin-top: 6px;
+      min-height: 16px;
+      font-weight: bold;
+    }
+    .calc-feedback.ok { color: #2e7d32; }
+    .calc-feedback.err { color: #d32f2f; }
+    .calc-feedback.info { color: var(--label-color); }
+
     /* ---------- OCR MODAL ---------- */
     .ocr-modal {
       position: fixed;
@@ -360,26 +400,49 @@
     .ocr-close:hover { opacity: 0.75; }
     .ocr-body { padding: 14px; }
 
-    .ocr-type-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .ocr-type-row label {
+    .ocr-type-block { margin-bottom: 12px; }
+    .ocr-type-label {
       font-size: 13px;
       font-weight: bold;
       color: var(--label-color);
+      display: block;
+      margin-bottom: 6px;
     }
-    .ocr-type-row select {
-      padding: 5px 8px;
-      font-size: 14px;
+    .ocr-type-required {
+      font-weight: normal;
+      font-size: 11px;
+      color: #d32f2f;
+      margin-left: 6px;
+    }
+    .ocr-type-radios {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      padding: 8px 12px;
+      border: 1px solid var(--input-border);
       border-radius: 4px;
-      border: 1px solid var(--select-border);
-      background: var(--select-bg);
-      color: var(--select-text);
+      background: var(--input-bg);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .ocr-type-radios.missing {
+      border-color: #d32f2f;
+      box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.15);
+    }
+    .ocr-type-radios label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
       cursor: pointer;
-      min-width: 140px;
+      color: var(--text-color);
+      user-select: none;
+    }
+    .ocr-type-radios input[type=radio] {
+      accent-color: var(--panel-header-bg-2);
+      cursor: pointer;
+      margin: 0;
+      width: 16px;
+      height: 16px;
     }
 
     .ocr-hint {
@@ -498,7 +561,6 @@
       100% { background-position: -100% 0; }
     }
 
-    /* NEW: OCR warnings line */
     .ocr-warnings {
       display: none;
       font-size: 13px;
@@ -581,6 +643,8 @@
       .percent, .percent-spacer { width: auto; text-align: left; }
       .top-bar button { font-size: 12px; padding: 5px 10px; }
       .mask-viewport { width: 100%; }
+      .ocr-type-radios { gap: 8px 14px; }
+      .calc-btn { width: 100%; }
     }
   </style>
 </head>
@@ -600,7 +664,6 @@
     <div class="logo-row">
       <div class="speech-bubble">
         fellow alchemist~ all values are based on empirical data and percentile calculation. no data mining so some inaccuracies may occur.
-        The OCR will be wonky, but if you are lazy it can do a lot of work for you.
       </div>
       <img src="./resources/xiaomao.png" alt="Xiaomao Homunculus Calculator" class="logo">
     </div>
@@ -637,9 +700,17 @@
       </div>
       <div class="panel-body" id="statsContainer"></div>
     </div>
+
+    <div class="calc-wrapper">
+      <button id="calcBtn" class="calc-btn">Calculate</button>
+      <div class="calc-feedback" id="calcFeedback"></div>
+      <div class="calc-note" id="calcNote">
+        Clicking Calculate submits your stats anonymously to help improve future accuracy of this tool.
+      </div>
+    </div>
   </div>
 
-  <!-- ---------- OCR MODAL (MASK-BASED) ---------- -->
+  <!-- ---------- OCR MODAL ---------- -->
   <div class="ocr-modal hidden" id="ocrModal">
     <div class="ocr-content">
       <div class="ocr-header">
@@ -648,14 +719,17 @@
       </div>
       <div class="ocr-body">
 
-        <div class="ocr-type-row">
-          <label for="ocrHomunculusType">Homunculus:</label>
-          <select id="ocrHomunculusType">
-            <option value="Amistr">Amistr</option>
-            <option value="Filir">Filir</option>
-            <option value="Lif">Lif</option>
-            <option value="Vanilmirth">Vanilmirth</option>
-          </select>
+        <div class="ocr-type-block">
+          <span class="ocr-type-label">
+            Homunculus:
+            <span class="ocr-type-required">* required</span>
+          </span>
+          <div class="ocr-type-radios" id="ocrTypeRadios">
+            <label><input type="radio" name="ocrHomunculus" value="Amistr"> Amistr</label>
+            <label><input type="radio" name="ocrHomunculus" value="Filir"> Filir</label>
+            <label><input type="radio" name="ocrHomunculus" value="Lif"> Lif</label>
+            <label><input type="radio" name="ocrHomunculus" value="Vanilmirth"> Vanilmirth</label>
+          </div>
         </div>
 
         <p class="ocr-hint">
@@ -685,6 +759,80 @@
   </div>
 
   <script>
+    // ================================================================
+    //  GOOGLE FORMS CONFIG — one form per homunculus
+    // ================================================================
+    const GOOGLE_FORMS_ACTION = {
+      Amistr:     'https://docs.google.com/forms/d/e/1FAIpQLSfGiu9569-j1aSala1XVBRK7IkQkWFHrHeq2vuUz-o_9_d8vA/formResponse',
+      Filir:      'https://docs.google.com/forms/d/e/1FAIpQLScBSjnrVFTZiPb6nqidPcTf5OohjZelgmVVqFSd0aH0UbOpIA/formResponse',
+      Lif:        'https://docs.google.com/forms/d/e/1FAIpQLSf712ugNSnCKb9I7KrUWJ4N1xJFUCdK2QhmoGlKksnDOSXzvw/formResponse',
+      Vanilmirth: 'https://docs.google.com/forms/d/e/1FAIpQLSdGARPLc0MxyvvlGdWVK4ns_sA5AePSQihsV1x_gZu0wakZ0w/formResponse'
+    };
+
+    // Entry IDs — identical across all four forms since they were cloned
+    const GOOGLE_FORM_FIELDS = {
+      level:      'entry.1727174717',
+      skillLevel: 'entry.1189504408',
+      HP:         'entry.508594949',
+      SP:         'entry.602876427',
+      ATK:        'entry.397170740',
+      MATK:       'entry.1569209746',
+      HIT:        'entry.130802553',
+      CRITICAL:   'entry.1215578889',
+      DEF:        'entry.482018045',
+      MDEF:       'entry.1970030492',
+      FLEE:       'entry.991570991',
+      ASPD:       'entry.2118125795'
+    };
+
+    // ---------- DAILY SUBMISSION LIMIT (localStorage) ----------
+    const DAILY_LIMIT = 10;
+    const SUBMIT_LOG_KEY = 'homunculus_submit_log';
+    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+    function getSubmissionsInLast24h() {
+      try {
+        const raw = localStorage.getItem(SUBMIT_LOG_KEY);
+        if (!raw) return [];
+        const log = JSON.parse(raw);
+        if (!Array.isArray(log)) return [];
+        const cutoff = Date.now() - ONE_DAY_MS;
+        return log.filter(ts => typeof ts === 'number' && ts > cutoff);
+      } catch {
+        return [];
+      }
+    }
+
+    function recordSubmission() {
+      const log = getSubmissionsInLast24h();
+      log.push(Date.now());
+      try {
+        localStorage.setItem(SUBMIT_LOG_KEY, JSON.stringify(log));
+      } catch {}
+    }
+
+    function checkDailyLimit() {
+      const log = getSubmissionsInLast24h();
+      if (log.length >= DAILY_LIMIT) {
+        const oldest = Math.min(...log);
+        const resetsInMs = oldest + ONE_DAY_MS - Date.now();
+        const hours = Math.max(1, Math.ceil(resetsInMs / (60 * 60 * 1000)));
+        return { blocked: true, hours };
+      }
+      return { blocked: false, remaining: DAILY_LIMIT - log.length };
+    }
+
+    function updateRemainingNote() {
+      const check = checkDailyLimit();
+      const note = document.getElementById('calcNote');
+      if (!note) return;
+      if (check.blocked) {
+        note.textContent = `Daily submission limit reached. You can submit again in ~${check.hours} hour${check.hours === 1 ? '' : 's'}. Results are still calculated locally.`;
+      } else {
+        note.textContent = `Clicking Calculate submits your stats anonymously to help improve future accuracy of this tool. (${check.remaining} submission${check.remaining === 1 ? '' : 's'} left today)`;
+      }
+    }
+
     // ---------- DATA ----------
     const homunculusData = {
       Amistr: {
@@ -693,9 +841,9 @@
         maxGain: { HP: 298, SP: 20, ATK: 3.20, MATK: 15, HIT: 3.20, CRITICAL: 0.52, DEF: 8.50, MDEF: 5.50, FLEE: 4.98, ASPD: 0.82 }
       },
       Filir: {
-        base: { HP: 90, SP: 25, ATK: 34, MATK: 50, HIT: 181, CRITICAL: 4, DEF: 35, MDEF: 14, FLEE: 136, ASPD: 141 },
-        minGain: { HP: 45, SP: 4, ATK: 1.00, MATK: 3, HIT: 1.00, CRITICAL: 0.50, DEF: 0.50, MDEF: 0.34, FLEE: 1.00, ASPD: 0.50 },
-        maxGain: { HP: 149, SP: 12, ATK: 4.35, MATK: 12, HIT: 4.57, CRITICAL: 0.58, DEF: 4.50, MDEF: 2.20, FLEE: 5.05, ASPD: 0.91 }
+        base: { HP: 280, SP: 12, ATK: 30, MATK: 50, HIT: 180, CRITICAL: 7, DEF: 70, MDEF: 30, FLEE: 130, ASPD: 140 },
+        minGain: { HP: 60, SP: 5, ATK: 1, MATK: 3, HIT: 1, CRITICAL: 0, DEF: 1, MDEF: 1, FLEE: 2, ASPD: 0 },
+        maxGain: { HP: 200, SP: 15, ATK: 5, MATK: 12, HIT: 3, CRITICAL: 2, DEF: 8, MDEF: 5, FLEE: 6, ASPD: 1 }
       },
       Lif: {
         base: { HP: 150, SP: 40, ATK: 25, MATK: 144, HIT: 175, CRITICAL: 5, DEF: 40, MDEF: 46, FLEE: 121, ASPD: 137 },
@@ -749,7 +897,6 @@
       CRITICAL: 'CRITICAL', DEF: 'DEF', MDEF: 'MDEF', FLEE: 'FLEE', ASPD: 'ASPD'
     };
 
-    // ---------- MASK REGIONS ----------
     const MASK_REGIONS = {
       ATK:      { label: 'Atk',  read: { x: 0.175, y: 0.170, w: 0.120, h: 0.070 } },
       MATK:     { label: 'Matk', read: { x: 0.175, y: 0.250, w: 0.120, h: 0.070 } },
@@ -763,14 +910,11 @@
       MDEF:     { label: 'Mdef', read: { x: 0.175, y: 0.570, w: 0.120, h: 0.070 } },
       FLEE:     { label: 'Flee', read: { x: 0.175, y: 0.650, w: 0.120, h: 0.070 } },
       ASPD:     { label: 'Aspd', read: { x: 0.175, y: 0.730, w: 0.120, h: 0.070 } },
-
       LVL:      { label: 'Lvl',  read: { x: 0.435, y: 0.265, w: 0.100, h: 0.070 } },
-
       HP:       { label: 'HP',   read: { x: 0.695, y: 0.375, w: 0.140, h: 0.070 } },
       SP:       { label: 'SP',   read: { x: 0.695, y: 0.445, w: 0.140, h: 0.070 } }
     };
 
-    // ---------- STATISTICAL HELPERS ----------
     function normalCDF(z) {
       const t = 1 / (1 + 0.2316419 * Math.abs(z));
       const d = 0.3989423 * Math.exp(-z * z / 2);
@@ -778,7 +922,6 @@
       return z > 0 ? 1 - p : p;
     }
 
-    // ---------- APP STATE ----------
     let currentType = 'Amistr';
     let currentData = homunculusData[currentType];
     let currentSkillLevel = 0;
@@ -791,6 +934,8 @@
     const skillIcon = document.getElementById('skillIcon');
     const skillName = document.getElementById('skillName');
     const skillLevelSelect = document.getElementById('skillLevel');
+    const calcBtn = document.getElementById('calcBtn');
+    const calcFeedback = document.getElementById('calcFeedback');
 
     function buildStatsUI() {
       statsContainer.innerHTML = '';
@@ -820,15 +965,24 @@
               <div class="avg-line"></div>
             </div>
           </div>
-          <span class="percent" id="percent-${key}">0%</span>
+          <span class="percent" id="percent-${key}">—</span>
         `;
         statsContainer.appendChild(row);
       });
+    }
 
-      document.getElementById('input-LVL').addEventListener('input', updateAll);
+    function clearResults() {
       statKeys.forEach(key => {
-        document.getElementById(`input-${key}`).addEventListener('input', updateAll);
+        const bar = document.getElementById(`bar-${key}`);
+        if (bar) {
+          bar.style.width = '0%';
+          bar.style.backgroundColor = '#4caf50';
+        }
+        const percent = document.getElementById(`percent-${key}`);
+        if (percent) percent.textContent = '—';
       });
+      calcFeedback.textContent = '';
+      calcFeedback.className = 'calc-feedback';
     }
 
     function resetInputs() {
@@ -838,7 +992,7 @@
         const input = document.getElementById(`input-${key}`);
         input.value = currentData.base[key];
       });
-      updateAll();
+      clearResults();
     }
 
     function updateSkillSelector() {
@@ -923,6 +1077,42 @@
       });
     }
 
+    // ---------- GOOGLE FORMS SUBMISSION ----------
+    async function submitData() {
+      const action = GOOGLE_FORMS_ACTION[currentType];
+      if (!action) {
+        console.info('[Calculator] No Google Form configured for', currentType);
+        return { ok: true, skipped: true };
+      }
+
+      const levelInput = document.getElementById('input-LVL');
+      const params = new URLSearchParams();
+
+      params.append(GOOGLE_FORM_FIELDS.level, levelInput.value);
+      params.append(GOOGLE_FORM_FIELDS.skillLevel, currentSkillLevel);
+
+      statKeys.forEach(key => {
+        const fieldId = GOOGLE_FORM_FIELDS[key];
+        if (fieldId) {
+          params.append(fieldId, document.getElementById(`input-${key}`).value);
+        }
+      });
+
+      const url = `${action}?${params.toString()}`;
+
+      // Hidden-iframe submission — bypasses CORS, works on GitHub Pages
+      return new Promise((resolve) => {
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = url;
+        document.body.appendChild(iframe);
+        setTimeout(() => {
+          try { document.body.removeChild(iframe); } catch (_) {}
+          resolve({ ok: true });
+        }, 1200);
+      });
+    }
+
     function updateType() {
       currentType = select.value;
       currentData = homunculusData[currentType];
@@ -941,7 +1131,51 @@
 
     skillLevelSelect.addEventListener('change', () => {
       currentSkillLevel = parseInt(skillLevelSelect.value) || 0;
+      clearResults();
+    });
+
+    // ---------- CALCULATE BUTTON ----------
+    calcBtn.addEventListener('click', async () => {
+      // Always compute and display — the user gets their answer regardless
       updateAll();
+
+      // Check daily submission cap
+      const check = checkDailyLimit();
+      if (check.blocked) {
+        calcFeedback.textContent = `Daily limit reached (${DAILY_LIMIT}/day). Results shown, but this submission was not sent.`;
+        calcFeedback.className = 'calc-feedback err';
+        updateRemainingNote();
+        return;
+      }
+
+      calcBtn.disabled = true;
+      calcFeedback.textContent = 'Submitting…';
+      calcFeedback.className = 'calc-feedback';
+
+      const result = await submitData();
+
+      if (result.skipped) {
+        calcFeedback.textContent = '';
+        calcFeedback.className = 'calc-feedback';
+      } else if (result.ok) {
+        recordSubmission();
+        const remaining = check.remaining - 1;
+        calcFeedback.textContent = `✓ Results submitted — thank you! (${remaining} left today)`;
+        calcFeedback.className = 'calc-feedback ok';
+        updateRemainingNote();
+      } else {
+        calcFeedback.textContent = '⚠ Submission failed (results shown anyway)';
+        calcFeedback.className = 'calc-feedback err';
+      }
+
+      calcBtn.disabled = false;
+
+      setTimeout(() => {
+        if (calcFeedback.classList.contains('ok')) {
+          calcFeedback.textContent = '';
+          calcFeedback.className = 'calc-feedback';
+        }
+      }, 5000);
     });
 
     // ---------- DARK MODE ----------
@@ -983,7 +1217,9 @@
     const rawTextWrap = document.getElementById('rawTextWrap');
     const rawTextBox = document.getElementById('rawText');
     const readValuesBtn = document.getElementById('readValuesBtn');
-    const ocrHomunculusType = document.getElementById('ocrHomunculusType');
+
+    const ocrTypeRadiosEl = document.getElementById('ocrTypeRadios');
+    const ocrTypeRadios = ocrTypeRadiosEl.querySelectorAll('input[name="ocrHomunculus"]');
 
     const MASK_W = 390;
     const MASK_H = 300;
@@ -1006,8 +1242,25 @@
       return tesseractLoadPromise;
     }
 
+    function getSelectedOcrType() {
+      const checked = ocrTypeRadiosEl.querySelector('input[name="ocrHomunculus"]:checked');
+      return checked ? checked.value : null;
+    }
+
+    function updateReadButtonState() {
+      const hasImage = !!uploadedImageEl;
+      const hasType = !!getSelectedOcrType();
+      readValuesBtn.disabled = !(hasImage && hasType);
+      ocrTypeRadiosEl.classList.toggle('missing', !hasType);
+    }
+
+    function clearOcrRadioSelection() {
+      ocrTypeRadios.forEach(r => { r.checked = false; });
+    }
+
     function openOcrModal() {
-      ocrHomunculusType.value = select.value;
+      clearOcrRadioSelection();
+      updateReadButtonState();
       ocrModal.classList.remove('hidden');
     }
     function closeOcrModal() { ocrModal.classList.add('hidden'); }
@@ -1022,21 +1275,18 @@
       if (e.key === 'Escape' && !ocrModal.classList.contains('hidden')) closeOcrModal();
     });
 
-    ocrHomunculusType.addEventListener('change', () => {
-      const newType = ocrHomunculusType.value;
-      if (select.value !== newType) {
-        select.value = newType;
-        updateType();
-      }
+    ocrTypeRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (!radio.checked) return;
+        const newType = radio.value;
+        if (select.value !== newType) {
+          select.value = newType;
+          updateType();
+        }
+        updateReadButtonState();
+      });
     });
 
-    select.addEventListener('change', () => {
-      if (!ocrModal.classList.contains('hidden')) {
-        ocrHomunculusType.value = select.value;
-      }
-    });
-
-    // ---------- DRAW THE MASK ----------
     function redrawMask() {
       const ctx = maskCanvas.getContext('2d');
       ctx.clearRect(0, 0, MASK_W, MASK_H);
@@ -1097,7 +1347,7 @@
           ocrStatus.className = 'ocr-status';
           ocrStatus.textContent = `Loaded ${img.naturalWidth}×${img.naturalHeight}. Align each number inside its red box, then click "Read Values".`;
           hideOcrWarnings();
-          readValuesBtn.disabled = false;
+          updateReadButtonState();
           if (rawTextWrap) rawTextWrap.style.display = 'none';
           if (rawTextBox) rawTextBox.textContent = '';
         };
@@ -1106,7 +1356,6 @@
       reader.readAsDataURL(file);
     });
 
-    // ---------- DRAG TO PAN ----------
     let isDragging = false;
     let dragStartCanvasX = 0, dragStartCanvasY = 0;
     let dragStartImgX = 0, dragStartImgY = 0;
@@ -1167,7 +1416,6 @@
       fitImageToMask();
     });
 
-    // ---------- CROP A REGION FOR OCR ----------
     function cropRegion(region) {
       const r = region.read;
       const rx = r.x * MASK_W;
@@ -1195,7 +1443,6 @@
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(uploadedImageEl, sx, sy, sw, sh, 0, 0, dstW, dstH);
 
-      // Contrast boost + threshold-ish
       const id = ctx.getImageData(0, 0, dstW, dstH);
       const d = id.data;
       const CONTRAST = 2.8;
@@ -1215,19 +1462,13 @@
       return c;
     }
 
-    // ---------- OCR WARNINGS HELPERS ----------
     function hideOcrWarnings() {
       ocrWarnings.classList.remove('visible');
       ocrWarnings.textContent = '';
     }
 
-    // Fields that are allowed to have a single digit value
     const SINGLE_DIGIT_OK = new Set(['CRITICAL', 'LVL']);
 
-    // Detect fields whose OCR result looks suspicious:
-    //   • empty (no digits detected)
-    //   • starts with "0" (likely a dropped leading digit)
-    //   • single digit for stats that should have at least two (all but CRIT & LVL)
     function collectOcrProblems(results) {
       const problems = [];
       const order = Object.keys(MASK_REGIONS);
@@ -1261,9 +1502,16 @@
       ocrWarnings.classList.add('visible');
     }
 
-    // ---------- READ VALUES ----------
     readValuesBtn.addEventListener('click', async () => {
       if (!uploadedImageEl) return;
+      const chosenType = getSelectedOcrType();
+      if (!chosenType) {
+        ocrStatus.className = 'ocr-status error';
+        ocrStatus.textContent = 'Please select a Homunculus before reading values.';
+        updateReadButtonState();
+        return;
+      }
+
       readValuesBtn.disabled = true;
       hideOcrWarnings();
       ocrStatus.className = 'ocr-status';
@@ -1330,7 +1578,7 @@
           }
         });
 
-        updateAll();
+        clearResults();
 
         const debugLines = order
           .filter(k => results[k])
@@ -1342,7 +1590,6 @@
         if (rawTextBox) rawTextBox.textContent = debugLines.join('\n');
         if (rawTextWrap) rawTextWrap.style.display = 'block';
 
-        // Suspicious-value warnings
         const problems = collectOcrProblems(results);
         showOcrWarnings(problems);
 
@@ -1351,18 +1598,20 @@
           ocrStatus.textContent = 'No values detected. Try zooming/aligning the image more precisely.';
         } else {
           ocrStatus.className = 'ocr-status success';
-          ocrStatus.textContent = `✓ Filled ${filled} field${filled === 1 ? '' : 's'}. Close and verify the values.`;
+          ocrStatus.textContent = `✓ Filled ${filled} field${filled === 1 ? '' : 's'} for ${chosenType}. Close this window, then click Calculate.`;
         }
       } catch (err) {
         console.error(err);
         ocrStatus.className = 'ocr-status error';
         ocrStatus.textContent = 'OCR failed: ' + err.message;
       } finally {
-        readValuesBtn.disabled = false;
+        updateReadButtonState();
       }
     });
 
+    updateReadButtonState();
     redrawMask();
+    updateRemainingNote();
   </script>
 </body>
 </html>
