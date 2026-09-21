@@ -7,6 +7,7 @@
   <style>
     * { box-sizing: border-box; }
 
+    /* theme vars */
     :root {
       --bg-body: #f4fbfa;
       --text-color: #2f5d58;
@@ -26,11 +27,13 @@
       --select-text: #2f5d58;
       --shadow-color: rgba(0,0,0,0.15);
       --sprite-filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
-      --avg-line-color: rgba(0,0,0,0.55);
       --bubble-bg: #f7ecc9;
       --bubble-border: #c9b47a;
       --bubble-text: #5a4a2a;
       --bubble-shadow: rgba(120, 95, 40, 0.25);
+      --score-color: #1a7f72;
+      --score-glow: rgba(26, 127, 114, 0.25);
+      --beta-color: #d32f2f;
     }
 
     body.dark {
@@ -52,11 +55,13 @@
       --select-text: #c0e0dc;
       --shadow-color: rgba(0,0,0,0.5);
       --sprite-filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.6));
-      --avg-line-color: rgba(255,255,255,0.55);
       --bubble-bg: #3a3220;
       --bubble-border: #7a6a3a;
       --bubble-text: #ecdcaa;
       --bubble-shadow: rgba(0,0,0,0.5);
+      --score-color: #7ee0d3;
+      --score-glow: rgba(126, 224, 211, 0.5);
+      --beta-color: #ff6b6b;
     }
 
     body {
@@ -70,20 +75,81 @@
 
     .container { max-width: 850px; margin: 0 auto; }
 
-    .top-bar { text-align: right; margin-bottom: 5px; }
+    /* top bar */
+    .top-bar {
+      max-width: 560px;
+      margin: 0 auto 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .top-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
     .top-bar button {
       background: transparent;
-      border: 1px solid var(--panel-border);
-      color: var(--text-color);
-      padding: 6px 14px;
-      border-radius: 4px;
-      font-size: 14px;
+      border: none;
+      color: var(--label-color);
+      padding: 0;
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      opacity: 0.75;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-      margin-left: 6px;
+      transition: opacity 0.2s, color 0.2s;
+      margin: 0;
+      font-family: inherit;
     }
-    .top-bar button:hover { background: var(--panel-header-bg-2); color: #ffffff; }
+    .top-bar button:hover {
+      opacity: 1;
+      color: var(--text-color);
+      background: transparent;
+    }
+    .top-bar button:active { transform: translateY(1px); }
 
+    /* debug toggle */
+    .debug-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--label-color);
+      opacity: 0.75;
+      cursor: pointer;
+      user-select: none;
+      margin: 0;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .debug-toggle:hover { opacity: 1; color: var(--text-color); }
+    .debug-toggle input[type=checkbox] {
+      accent-color: var(--panel-header-bg-2);
+      cursor: pointer;
+      margin: 0;
+      width: 12px;
+      height: 12px;
+    }
+    .debug-toggle.active {
+      color: #d32f2f;
+      opacity: 1;
+    }
+    .debug-toggle.active:hover { color: #b71c1c; }
+    /* keeps layout space even when hidden */
+    .debug-toggle.hidden {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* logo row */
     .logo-row {
       display: flex;
       align-items: center;
@@ -93,7 +159,7 @@
     }
     .speech-bubble {
       position: relative;
-      max-width: 240px;
+      max-width: 280px;
       padding: 10px 14px;
       background: var(--bubble-bg);
       border: 1px solid var(--bubble-border);
@@ -125,6 +191,29 @@
       border-left: 9px solid var(--bubble-bg);
       z-index: 1;
     }
+    .beta-tag {
+      display: block;
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: var(--beta-color);
+      text-align: center;
+      line-height: 1;
+      margin: 0 0 4px 0;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+    }
+    .beta-sub {
+      display: block;
+      font-size: 10.5px;
+      font-style: italic;
+      text-align: center;
+      line-height: 1.35;
+      opacity: 0.9;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--bubble-border);
+    }
+
     .logo {
       display: block;
       width: 154px;
@@ -135,6 +224,29 @@
       flex-shrink: 0;
     }
 
+    .kofi-link {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+    .kofi-link img {
+      display: block;
+      height: 39px;
+      width: auto;
+    }
+    .kofi-link span {
+      font-size: 10px;
+      font-weight: bold;
+      color: var(--label-color);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      opacity: 0.75;
+    }
+
+    /* selector row */
     .controls {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
@@ -169,12 +281,13 @@
       cursor: pointer;
     }
 
+    /* panel */
     .panel {
       border: 1px solid var(--panel-border);
       border-radius: 6px;
       overflow: hidden;
       box-shadow: 0 4px 12px var(--shadow-color);
-      max-width: 700px;
+      max-width: 560px;
       margin: 0 auto;
     }
     .panel-header {
@@ -194,6 +307,7 @@
     }
     .panel-title { white-space: nowrap; }
 
+    /* skill selector */
     .skill-selector {
       display: flex;
       align-items: center;
@@ -220,101 +334,356 @@
       cursor: pointer;
       font-weight: bold;
     }
+    .skill-selector select.unset {
+      background: #ffd23a;
+      color: #5a4a2a;
+      border-color: #c9b47a;
+      animation: pulse-border 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse-border {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 210, 58, 0.6); }
+      50% { box-shadow: 0 0 0 4px rgba(255, 210, 58, 0.2); }
+    }
 
-    .panel-body { background: var(--panel-body-bg); padding: 16px 18px; }
+    /* panel body */
+    .panel-body {
+      background: var(--panel-body-bg);
+      padding: 14px 16px;
+      display: grid;
+      grid-template-columns: minmax(150px, 166px) 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .stats-pane {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
     .stat-row {
       display: flex;
       align-items: center;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 0;
+    }
+    /* gap under lvl / sp */
+    #row-LVL, #row-SP {
+      margin-bottom: 20px;
     }
     .stat-label {
-      width: 80px;
+      width: 68px;
       font-weight: bold;
       color: var(--label-color);
-      font-size: 14px;
+      font-size: 13px;
     }
     .stat-input {
-      width: 80px;
+      width: 76px;
       padding: 5px 6px;
       border: 1px solid var(--input-border);
       border-radius: 4px;
-      font-size: 14px;
+      font-size: 13px;
       background: var(--input-bg);
       color: var(--text-color);
     }
-    .stat-input:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      background: var(--bar-container-bg);
+
+    /* rating pane */
+    .rating-pane {
+      position: relative;
+      height: 500px;
+      border: 1px solid var(--bar-container-border);
+      border-radius: 8px;
+      background: var(--input-bg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px;
+      transition: background 0.3s, border-color 0.3s;
     }
 
-    .bar-wrapper { flex-grow: 1; min-width: 80px; margin: 0 10px; }
-    .bar-labels {
+    .rating-empty-hint {
+      position: absolute;
+      inset: 0;
       display: flex;
-      justify-content: space-between;
-      font-size: 10px;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
       color: var(--label-color);
-      opacity: 0.9;
-      padding: 0 2px;
-      margin-bottom: 2px;
-      line-height: 1;
-      letter-spacing: 0.3px;
-      user-select: none;
-    }
-    .bar-header {
+      opacity: 0.55;
+      font-style: italic;
       text-align: center;
+      padding: 20px;
+    }
+    .rating-pane.active .rating-empty-hint { display: none; }
+
+    /* loading bar */
+    .loading-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .loading-wrap.active { opacity: 1; }
+    .loading-track {
+      width: 100%;
+      max-width: 200px;
+      height: 12px;
+      background: var(--bar-container-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .loading-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--panel-header-bg-2), var(--panel-header-bg-1));
+      border-radius: 5px;
+    }
+    .loading-text {
+      margin-top: 10px;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: var(--label-color);
+      text-transform: uppercase;
+    }
+
+    /* rating card */
+    .rating-card {
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    .rating-card.active { display: flex; }
+
+    .rating-badge-wrap {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      opacity: 0;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .rating-badge-wrap.drop-active {
+      animation: rankDrop 0.8s cubic-bezier(0.5, 0, 1, 1) forwards;
+    }
+    .rating-badge-wrap.shown {
+      opacity: 1;
+    }
+    @keyframes rankDrop {
+      0% {
+        transform: translateY(-320px) scale(3);
+        filter: brightness(0.05) drop-shadow(0 0 0 rgba(0,0,0,0));
+        opacity: 1;
+      }
+      70% {
+        transform: translateY(0) scale(1.15);
+        filter: brightness(0.8) drop-shadow(0 8px 12px rgba(0,0,0,0.4));
+      }
+      85% {
+        transform: translateY(0) scale(0.92);
+        filter: brightness(1.4) drop-shadow(0 16px 24px rgba(0,0,0,0.6));
+      }
+      100% {
+        transform: translateY(0) scale(1);
+        filter: brightness(1) drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        opacity: 1;
+      }
+    }
+
+    .rating-badge {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    .badge-flash {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 200px;
+      height: 200px;
+      margin-top: -100px;
+      margin-left: -100px;
+      border-radius: 50%;
+      background: radial-gradient(circle,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 245, 200, 0.7) 18%,
+        rgba(255, 255, 255, 0.35) 40%,
+        rgba(255, 255, 255, 0) 70%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .badge-flash.active {
+      animation: badgeFlashAnim 0.55s ease-out;
+    }
+    @keyframes badgeFlashAnim {
+      0% { opacity: 0; transform: scale(0.35); }
+      15% { opacity: 1; transform: scale(0.7); }
+      100% { opacity: 0; transform: scale(1.8); }
+    }
+
+    .rating-label {
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: var(--label-color);
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .rating-label.visible { opacity: 1; }
+
+    .rating-score {
+      font-size: 24px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: var(--score-color);
+      text-shadow: 0 0 14px var(--score-glow);
+      opacity: 0;
+      transition: opacity 0.4s;
+      line-height: 1.1;
+    }
+    .rating-score.visible { opacity: 1; }
+
+    /* rank bar */
+    .rank-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      margin-top: 4px;
+      padding: 40px 4px 0 4px;
+      opacity: 0;
+      transition: opacity 0.4s;
+      position: relative;
+    }
+    .rank-bar-wrap.visible { opacity: 1; }
+
+    .rank-bar-side {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      flex-shrink: 0;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+    }
+    .rank-bar-side.placeholder { visibility: hidden; }
+
+    .rank-bar-track {
+      position: relative;
+      flex: 1;
+      height: 20px;
+      background: var(--bar-container-bg);
+      border: 1px solid var(--bar-container-border);
+      border-radius: 10px;
+      overflow: visible;
+    }
+    .rank-bar-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 0%;
+      background: linear-gradient(90deg, var(--panel-header-bg-2), var(--panel-header-bg-1));
+      border-radius: 9px;
+      transition: width 1.5s ease-out;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.4);
+    }
+    .rank-bar-runner {
+      position: absolute;
+      bottom: 100%;
+      left: 0%;
+      width: 44px;
+      height: auto;
+      transition: left 1.5s ease-out;
+      pointer-events: none;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.35));
+      transform: translate(calc(-50% - 5px), 20px);
+      animation: runnerBounce 0.5s ease-in-out infinite alternate;
+    }
+    @keyframes runnerBounce {
+      from { transform: translate(calc(-50% - 5px), 20px); }
+      to   { transform: translate(calc(-50% - 5px), 14px); }
+    }
+
+    /* rating table */
+    .rating-table {
+      width: 100%;
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+      min-height: 176px;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .rating-table.visible { opacity: 1; }
+
+    .rating-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 6px;
+      background: var(--bar-container-bg);
+      border: 1px solid var(--bar-container-border);
+      border-radius: 4px;
+      min-width: 0;
+    }
+    .rating-row-icon {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      flex-shrink: 0;
+    }
+    .rating-row-icon.empty { visibility: hidden; }
+    .rating-row-label {
+      flex: 1;
       font-size: 11px;
       font-weight: bold;
       color: var(--label-color);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      opacity: 0.85;
-      user-select: none;
-      padding-bottom: 2px;
-    }
-    .bar-container {
-      position: relative;
-      height: 18px;
-      background: var(--bar-container-bg);
-      border: 1px solid var(--bar-container-border);
-      border-radius: 9px;
+      white-space: nowrap;
       overflow: hidden;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+      text-overflow: ellipsis;
     }
-    .bar {
-      position: relative;
-      z-index: 1;
-      height: 100%;
-      width: 0%;
-      background: #4caf50;
-      transition: width 0.25s ease, background-color 0.25s ease;
-      border-radius: 9px;
-    }
-    .avg-line {
-      position: absolute;
-      left: 50%; top: 0; bottom: 0;
-      width: 1px;
-      background: var(--avg-line-color);
-      transform: translateX(-50%);
-      z-index: 2;
-      pointer-events: none;
-    }
-    .percent {
-      width: 55px;
-      text-align: right;
+    .rating-row-value {
+      font-size: 11px;
       font-weight: bold;
-      font-size: 14px;
-      color: var(--percent-color);
+      color: var(--text-color);
+      flex-shrink: 0;
     }
-    .percent-spacer { width: 55px; }
-    .stat-row.level-row .stat-label { color: var(--label-color); }
 
+    /* confetti */
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #f00;
+      z-index: 60;
+      pointer-events: none;
+      border-radius: 1px;
+    }
+
+    /* calculate button */
     .calc-wrapper {
-      max-width: 700px;
-      margin: 14px auto 0;
+      max-width: 560px;
+      margin: 10px auto 0;
       text-align: center;
+    }
+    .calc-btn-wrap {
+      position: relative;
+      display: inline-block;
     }
     .calc-btn {
       background: linear-gradient(to bottom, var(--panel-header-bg-1), var(--panel-header-bg-2));
@@ -328,19 +697,55 @@
       cursor: pointer;
       text-shadow: 1px 1px 2px var(--panel-header-text-shadow);
       box-shadow: 0 3px 8px var(--shadow-color);
-      transition: filter 0.15s, transform 0.1s;
+      transition: filter 0.15s, transform 0.1s, opacity 0.15s;
       min-width: 200px;
     }
-    .calc-btn:hover { filter: brightness(1.08); }
-    .calc-btn:active { transform: translateY(1px); }
-    .calc-btn:disabled { opacity: 0.7; cursor: wait; }
-    .calc-note {
-      font-size: 11px;
-      color: var(--label-color);
-      opacity: 0.85;
-      margin-top: 8px;
-      line-height: 1.4;
+    .calc-btn:hover:not(:disabled) { filter: brightness(1.08); }
+    .calc-btn:active:not(:disabled) { transform: translateY(1px); }
+    .calc-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .calc-btn-wrap[data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 14px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bubble-bg);
+      color: var(--bubble-text);
+      border: 1px solid var(--bubble-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      line-height: 1.45;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px var(--bubble-shadow);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.08s ease-out;
+      z-index: 20;
     }
+    .calc-btn-wrap[data-tooltip]::before {
+      content: '';
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: var(--bubble-bg);
+      border-right: 1px solid var(--bubble-border);
+      border-bottom: 1px solid var(--bubble-border);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.08s ease-out;
+      z-index: 19;
+    }
+    .calc-btn-wrap[data-tooltip]:hover::after,
+    .calc-btn-wrap[data-tooltip]:hover::before {
+      opacity: 1;
+      transition-duration: 0s;
+    }
+
     .calc-feedback {
       font-size: 12px;
       margin-top: 6px;
@@ -349,9 +754,8 @@
     }
     .calc-feedback.ok { color: #2e7d32; }
     .calc-feedback.err { color: #d32f2f; }
-    .calc-feedback.info { color: var(--label-color); }
 
-    /* ---------- OCR MODAL ---------- */
+    /* ocr modal */
     .ocr-modal {
       position: fixed;
       inset: 0;
@@ -571,10 +975,7 @@
     }
     .ocr-warnings.visible { display: block; }
 
-    .ocr-raw {
-      margin-bottom: 10px;
-      font-size: 12px;
-    }
+    .ocr-raw { margin-bottom: 10px; font-size: 12px; }
     .ocr-raw summary {
       cursor: pointer;
       color: var(--label-color);
@@ -626,10 +1027,17 @@
     }
     .ocr-actions button.primary:hover:not(:disabled) { filter: brightness(1.1); }
 
+    @media (max-width: 700px) {
+      .panel-body { grid-template-columns: 1fr; gap: 14px; }
+      .rating-pane { height: auto; min-height: 420px; }
+      .rating-table { min-height: 340px; }
+    }
+
     @media (max-width: 600px) {
       .logo-row { flex-direction: column; gap: 12px; }
       .speech-bubble { max-width: 100%; order: 2; }
       .speech-bubble::after, .speech-bubble::before { display: none; }
+      .kofi-link { order: 3; }
       .controls { display: flex; flex-direction: column; max-width: none; gap: 8px; }
       .sprite-left, .sprite-right { justify-self: auto; }
       .sprite-left { transform: scaleX(-1); }
@@ -637,14 +1045,13 @@
       .skill-selector { font-size: 11px; }
       .skill-selector img { width: 20px; height: 20px; }
       .skill-selector .skill-name { display: none; }
-      .stat-row { flex-direction: column; align-items: flex-start; margin-bottom: 12px; }
-      .stat-input { width: 100%; max-width: 120px; }
-      .bar-wrapper { width: 100%; margin: 6px 0; }
-      .percent, .percent-spacer { width: auto; text-align: left; }
-      .top-bar button { font-size: 12px; padding: 5px 10px; }
       .mask-viewport { width: 100%; }
       .ocr-type-radios { gap: 8px 14px; }
+      .calc-btn-wrap { display: block; width: 100%; }
       .calc-btn { width: 100%; }
+      .rating-table { grid-template-columns: 1fr; }
+      .beta-tag { font-size: 26px; }
+      .top-bar { max-width: 100%; }
     }
   </style>
 </head>
@@ -657,15 +1064,27 @@
 
   <div class="container">
     <div class="top-bar">
-      <button id="ocrToggle">📷 Load Screenshot</button>
-      <button id="themeToggle">☀️Mode</button>
+      <label id="debugLabel" class="debug-toggle hidden" title="when enabled, no data is uploaded">
+        <input type="checkbox" id="debugToggle">
+        Debug
+      </label>
+      <div class="top-bar-right">
+        <button id="ocrToggle">Load Screenshot</button>
+        <button id="themeToggle">Light</button>
+      </div>
     </div>
 
     <div class="logo-row">
       <div class="speech-bubble">
+        <span class="beta-tag">BETA</span>
+        <span class="beta-sub">data is still being collected. ranking is experimental. especially Lif data is low.</span>
         fellow alchemist~ all values are based on empirical data and percentile calculation. no data mining so some inaccuracies may occur.
       </div>
       <img src="./resources/xiaomao.png" alt="Xiaomao Homunculus Calculator" class="logo">
+      <a href="https://ko-fi.com/U2G8271YDP" target="_blank" rel="noopener" class="kofi-link" title="Support me on Ko-fi">
+        <img src="https://storage.ko-fi.com/cdn/badges/tip-kofi-alt.gif" alt="Support me on Ko-fi">
+        <span>Support Me</span>
+      </a>
     </div>
 
     <div class="controls">
@@ -688,7 +1107,8 @@
         <div class="skill-selector hidden" id="skillSelector">
           <img id="skillIcon" src="" alt="Skill">
           <span class="skill-name" id="skillName">Skill</span>
-          <select id="skillLevel" title="Skill level (0 = off)">
+          <select id="skillLevel" title="skill level">
+            <option value="">—</option>
             <option value="0">0</option>
             <option value="1">1</option>
             <option value="2">2</option>
@@ -698,27 +1118,57 @@
           </select>
         </div>
       </div>
-      <div class="panel-body" id="statsContainer"></div>
+      <div class="panel-body">
+        <div class="stats-pane" id="statsContainer"></div>
+        <div class="rating-pane" id="ratingPane">
+          <div class="rating-empty-hint" id="ratingEmptyHint">
+            Click Calculate to see your rank
+          </div>
+          <div class="loading-wrap" id="loadingWrap">
+            <div class="loading-track">
+              <div class="loading-fill" id="loadingFill"></div>
+            </div>
+            <div class="loading-text" id="loadingText">Calculating…</div>
+          </div>
+          <div class="rating-card" id="ratingCard">
+            <div class="rating-badge-wrap" id="ratingBadgeWrap">
+              <img class="rating-badge" id="ratingBadge" src="" alt="Rank Badge">
+              <div class="badge-flash" id="badgeFlash"></div>
+            </div>
+            <div class="rating-label" id="ratingLabel">RANK</div>
+            <div class="rating-score" id="ratingScore">0</div>
+
+            <div class="rank-bar-wrap" id="rankBarWrap">
+              <img class="rank-bar-side" id="rankBarCurrent" src="" alt="">
+              <div class="rank-bar-track">
+                <div class="rank-bar-fill" id="rankBarFill"></div>
+                <img class="rank-bar-runner" id="rankBarRunner" src="./resources/lif_walk0.gif" alt="">
+              </div>
+              <img class="rank-bar-side placeholder" id="rankBarNext" src="" alt="">
+            </div>
+
+            <div class="rating-table" id="ratingTable"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="calc-wrapper">
-      <button id="calcBtn" class="calc-btn">Calculate</button>
-      <div class="calc-feedback" id="calcFeedback"></div>
-      <div class="calc-note" id="calcNote">
-        Clicking Calculate submits your stats anonymously to help improve future accuracy of this tool.
+      <div class="calc-btn-wrap" id="calcBtnWrap">
+        <button id="calcBtn" class="calc-btn">Calculate</button>
       </div>
+      <div class="calc-feedback" id="calcFeedback"></div>
     </div>
   </div>
 
-  <!-- ---------- OCR MODAL ---------- -->
+  <!-- ocr modal -->
   <div class="ocr-modal hidden" id="ocrModal">
     <div class="ocr-content">
       <div class="ocr-header">
         <span>📷 Load from Screenshot</span>
-        <button class="ocr-close" id="ocrClose" aria-label="Close">✕</button>
+        <button class="ocr-close" id="ocrClose" aria-label="close">✕</button>
       </div>
       <div class="ocr-body">
-
         <div class="ocr-type-block">
           <span class="ocr-type-label">
             Homunculus:
@@ -759,9 +1209,9 @@
   </div>
 
   <script>
-    // ================================================================
-    //  GOOGLE FORMS CONFIG — one form per homunculus
-    // ================================================================
+    // config
+    const SHOW_DEBUG_TOGGLE = false;
+
     const GOOGLE_FORMS_ACTION = {
       Amistr:     'https://docs.google.com/forms/d/e/1FAIpQLSfGiu9569-j1aSala1XVBRK7IkQkWFHrHeq2vuUz-o_9_d8vA/formResponse',
       Filir:      'https://docs.google.com/forms/d/e/1FAIpQLScBSjnrVFTZiPb6nqidPcTf5OohjZelgmVVqFSd0aH0UbOpIA/formResponse',
@@ -784,75 +1234,73 @@
       ASPD:       'entry.2118125795'
     };
 
-    // ---------- DAILY SUBMISSION LIMIT (localStorage) ----------
-    const DAILY_LIMIT = 10;
-    const SUBMIT_LOG_KEY = 'homunculus_submit_log';
-    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+    const LAST_SUBMIT_KEY = 'homunculus_last_submit';
+    const COOLDOWN_MS = 60 * 1000;
+    const IMPOSSIBLE_TOLERANCE = 0.20;
 
-    function getSubmissionsInLast24h() {
-      try {
-        const raw = localStorage.getItem(SUBMIT_LOG_KEY);
-        if (!raw) return [];
-        const log = JSON.parse(raw);
-        if (!Array.isArray(log)) return [];
-        const cutoff = Date.now() - ONE_DAY_MS;
-        return log.filter(ts => typeof ts === 'number' && ts > cutoff);
-      } catch {
-        return [];
+    // rank tiers
+    const RANK_TIERS = [
+      { key: 'f',  min:  0,  max:  1 },
+      { key: 'e',  min:  1,  max: 20 },
+      { key: 'd',  min: 20,  max: 36 },
+      { key: 'c',  min: 36,  max: 50 },
+      { key: 'b',  min: 50,  max: 61 },
+      { key: 'a',  min: 61,  max: 71 },
+      { key: 's',  min: 71,  max: 85 },
+      { key: 'ss', min: 85,  max: 99 },
+      { key: 'u',  min: 99,  max: 101 }
+    ];
+
+    const RANK_NAMES = {
+      f: 'F', e: 'E', d: 'D', c: 'C', b: 'B',
+      a: 'A', s: 'S', ss: 'SS', u: 'U'
+    };
+
+    const RANK_IMG_BASE = './resources/';
+
+    function rankKeyFor(percentile) {
+      if (percentile < 0) percentile = 0;
+      if (percentile > 100) percentile = 100;
+      for (const tier of RANK_TIERS) {
+        if (percentile >= tier.min && percentile < tier.max) return tier.key;
       }
+      return 'u';
     }
 
-    function recordSubmission() {
-      const log = getSubmissionsInLast24h();
-      log.push(Date.now());
-      try {
-        localStorage.setItem(SUBMIT_LOG_KEY, JSON.stringify(log));
-      } catch {}
+    function rankImg(key) { return RANK_IMG_BASE + key + '.png'; }
+    function statRankImg(key) { return RANK_IMG_BASE + 'stat_' + key + '.png'; }
+
+    function nextRankTier(currentKey) {
+      const idx = RANK_TIERS.findIndex(t => t.key === currentKey);
+      if (idx < 0 || idx >= RANK_TIERS.length - 1) return null;
+      return RANK_TIERS[idx + 1];
     }
 
-    function checkDailyLimit() {
-      const log = getSubmissionsInLast24h();
-      if (log.length >= DAILY_LIMIT) {
-        const oldest = Math.min(...log);
-        const resetsInMs = oldest + ONE_DAY_MS - Date.now();
-        const hours = Math.max(1, Math.ceil(resetsInMs / (60 * 60 * 1000)));
-        return { blocked: true, hours };
-      }
-      return { blocked: false, remaining: DAILY_LIMIT - log.length };
-    }
-
-    function updateRemainingNote() {
-      const check = checkDailyLimit();
-      const note = document.getElementById('calcNote');
-      if (!note) return;
-      if (check.blocked) {
-        note.textContent = `Daily submission limit reached. You can submit again in ~${check.hours} hour${check.hours === 1 ? '' : 's'}. Results are still calculated locally.`;
-      } else {
-        note.textContent = `Clicking Calculate submits your stats anonymously to help improve future accuracy of this tool. (${check.remaining} submission${check.remaining === 1 ? '' : 's'} left today)`;
-      }
-    }
-
-    // ---------- DATA ----------
+    // data
     const homunculusData = {
       Amistr: {
-        base: { HP: 320, SP: 10, ATK: 28, MATK: 60, HIT: 175, CRITICAL: 5, DEF: 78, MDEF: 37, FLEE: 118, ASPD: 136 },
-        minGain: { HP: 81, SP: 6, ATK: 0.50, MATK: 4, HIT: 1.28, CRITICAL: 0.2, DEF: 0.50, MDEF: 0.50, FLEE: 0.50, ASPD: 0.28 },
-        maxGain: { HP: 298, SP: 20, ATK: 3.20, MATK: 15, HIT: 3.20, CRITICAL: 0.52, DEF: 8.50, MDEF: 5.50, FLEE: 4.98, ASPD: 0.82 }
+        base:    { HP: 320, SP: 10, ATK: 28, MATK: 60, HIT: 175, CRITICAL: 5, DEF: 78, MDEF: 37, FLEE: 118, ASPD: 136 },
+        minGain: { HP: 80, SP: 6, ATK: 0.50, MATK: 4, HIT: 1.28, CRITICAL: 0.15, DEF: 0.50, MDEF: 0.50, FLEE: 0.50, ASPD: 0.28 },
+        maxGain: { HP: 300, SP: 20, ATK: 3.20, MATK: 13, HIT: 3.00, CRITICAL: 0.44, DEF: 10.10, MDEF: 5.30, FLEE: 4.80, ASPD: 0.81 },
+        weights: { HP: 2.5, SP: 0.0, ATK: 1.0, MATK: 0.0, HIT: 0.5, CRITICAL: 0.0, DEF: 3.0, MDEF: 2.0, FLEE: 1.5, ASPD: 0.5 }
       },
       Filir: {
-        base: { HP: 280, SP: 12, ATK: 30, MATK: 50, HIT: 180, CRITICAL: 7, DEF: 70, MDEF: 30, FLEE: 130, ASPD: 140 },
-        minGain: { HP: 60, SP: 5, ATK: 1, MATK: 3, HIT: 1, CRITICAL: 0, DEF: 1, MDEF: 1, FLEE: 2, ASPD: 0 },
-        maxGain: { HP: 200, SP: 15, ATK: 5, MATK: 12, HIT: 3, CRITICAL: 2, DEF: 8, MDEF: 5, FLEE: 6, ASPD: 1 }
+        base:    { HP: 90, SP: 25, ATK: 34, MATK: 50, HIT: 181, CRITICAL: 4, DEF: 35, MDEF: 14, FLEE: 136, ASPD: 141 },
+        minGain: { HP: 45, SP: 4, ATK: 1.00, MATK: 3, HIT: 1.00, CRITICAL: 0.40, DEF: 0.50, MDEF: 0.34, FLEE: 1.00, ASPD: 0.50 },
+        maxGain: { HP: 149, SP: 12, ATK: 4.35, MATK: 12, HIT: 4.57, CRITICAL: 0.68, DEF: 4.50, MDEF: 2.20, FLEE: 5.05, ASPD: 0.91 },
+        weights: { HP: 1.0, SP: 0.5, ATK: 2.5, MATK: 0.0, HIT: 1.5, CRITICAL: 0.0, DEF: 1.0, MDEF: 0.5, FLEE: 3.0, ASPD: 1.5 }
       },
       Lif: {
-        base: { HP: 150, SP: 40, ATK: 25, MATK: 144, HIT: 175, CRITICAL: 5, DEF: 40, MDEF: 46, FLEE: 121, ASPD: 137 },
+        base:    { HP: 150, SP: 40, ATK: 25, MATK: 144, HIT: 175, CRITICAL: 5, DEF: 40, MDEF: 46, FLEE: 121, ASPD: 137 },
         minGain: { HP: 61, SP: 4, ATK: 0.50, MATK: 4, HIT: 1.36, CRITICAL: 0.2, DEF: 0.50, MDEF: 0.34, FLEE: 1, ASPD: 0.34 },
-        maxGain: { HP: 200, SP: 15, ATK: 3.67, MATK: 20, HIT: 4.1, CRITICAL: 0.34, DEF: 7.67, MDEF: 5.67, FLEE: 3.67, ASPD: 0.67 }
+        maxGain: { HP: 200, SP: 15, ATK: 3.67, MATK: 20, HIT: 4.1, CRITICAL: 0.34, DEF: 7.67, MDEF: 5.67, FLEE: 3.67, ASPD: 0.67 },
+        weights: { HP: 2.0, SP: 2.5, ATK: 0.5, MATK: 2.5, HIT: 0.5, CRITICAL: 0.0, DEF: 1.5, MDEF: 1.5, FLEE: 1.0, ASPD: 0.5 }
       },
       Vanilmirth: {
-        base: { HP: 80, SP: 11, ATK: 16, MATK: 52, HIT: 162, CRITICAL: 4, DEF: 27, MDEF: 19, FLEE: 112, ASPD: 133 },
+        base:    { HP: 80, SP: 11, ATK: 16, MATK: 52, HIT: 162, CRITICAL: 4, DEF: 27, MDEF: 19, FLEE: 112, ASPD: 133 },
         minGain: { HP: 45, SP: 0, ATK: 1.00, MATK: 5, HIT: 1.00, CRITICAL: 0.24, DEF: 2, MDEF: 1.00, FLEE: 1.00, ASPD: 0.27 },
-        maxGain: { HP: 281, SP: 12, ATK: 5.90, MATK: 23, HIT: 5.50, CRITICAL: 1.14, DEF: 11, MDEF: 7.87, FLEE: 5.72, ASPD: 1.43 }
+        maxGain: { HP: 281, SP: 12, ATK: 5.90, MATK: 23, HIT: 5.50, CRITICAL: 1.14, DEF: 11, MDEF: 7.87, FLEE: 5.72, ASPD: 1.43 },
+        weights: { HP: 2.0, SP: 0.5, ATK: 0.5, MATK: 1.5, HIT: 0.5, CRITICAL: 0.0, DEF: 3.0, MDEF: 2.5, FLEE: 1.5, ASPD: 0.5 }
       }
     };
 
@@ -893,9 +1341,10 @@
     const statKeys = ['HP', 'SP', 'ATK', 'MATK', 'HIT', 'CRITICAL', 'DEF', 'MDEF', 'FLEE', 'ASPD'];
     const statLabels = {
       HP: 'HP', SP: 'SP', ATK: 'ATK', MATK: 'MATK', HIT: 'HIT',
-      CRITICAL: 'CRITICAL', DEF: 'DEF', MDEF: 'MDEF', FLEE: 'FLEE', ASPD: 'ASPD'
+      CRITICAL: 'CRIT', DEF: 'DEF', MDEF: 'MDEF', FLEE: 'FLEE', ASPD: 'ASPD'
     };
 
+    // ocr mask regions
     const MASK_REGIONS = {
       ATK:      { label: 'Atk',  read: { x: 0.175, y: 0.170, w: 0.120, h: 0.070 } },
       MATK:     { label: 'Matk', read: { x: 0.175, y: 0.250, w: 0.120, h: 0.070 } },
@@ -921,9 +1370,14 @@
       return z > 0 ? 1 - p : p;
     }
 
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    // state
     let currentType = 'Amistr';
     let currentData = homunculusData[currentType];
-    let currentSkillLevel = 0;
+    let currentSkillLevel = null;
+    let debugMode = false;
+    let calculating = false;
 
     const select = document.getElementById('homunculusType');
     const sprite1 = document.getElementById('sprite1');
@@ -934,174 +1388,497 @@
     const skillName = document.getElementById('skillName');
     const skillLevelSelect = document.getElementById('skillLevel');
     const calcBtn = document.getElementById('calcBtn');
+    const calcBtnWrap = document.getElementById('calcBtnWrap');
     const calcFeedback = document.getElementById('calcFeedback');
 
+    const ratingPane = document.getElementById('ratingPane');
+    const loadingWrap = document.getElementById('loadingWrap');
+    const loadingFill = document.getElementById('loadingFill');
+    const ratingCard = document.getElementById('ratingCard');
+    const ratingBadgeWrap = document.getElementById('ratingBadgeWrap');
+    const ratingBadge = document.getElementById('ratingBadge');
+    const badgeFlash = document.getElementById('badgeFlash');
+    const ratingLabel = document.getElementById('ratingLabel');
+    const ratingScore = document.getElementById('ratingScore');
+    const ratingTable = document.getElementById('ratingTable');
+
+    const rankBarWrap = document.getElementById('rankBarWrap');
+    const rankBarCurrent = document.getElementById('rankBarCurrent');
+    const rankBarNext = document.getElementById('rankBarNext');
+    const rankBarFill = document.getElementById('rankBarFill');
+    const rankBarRunner = document.getElementById('rankBarRunner');
+
+    const debugLabelEl = document.getElementById('debugLabel');
+    const debugToggleEl = document.getElementById('debugToggle');
+
+    if (SHOW_DEBUG_TOGGLE) {
+      debugLabelEl.classList.remove('hidden');
+    } else {
+      debugLabelEl.classList.add('hidden');
+    }
+
+    debugToggleEl.addEventListener('change', () => {
+      debugMode = debugToggleEl.checked;
+      debugLabelEl.classList.toggle('active', debugMode);
+    });
+
+    // cooldown
+    function getCooldownRemainingSeconds() {
+      const last = parseInt(localStorage.getItem(LAST_SUBMIT_KEY) || '0', 10) || 0;
+      const elapsed = Date.now() - last;
+      const remaining = COOLDOWN_MS - elapsed;
+      return remaining > 0 ? Math.ceil(remaining / 1000) : 0;
+    }
+
+    function markSubmitTime() {
+      try { localStorage.setItem(LAST_SUBMIT_KEY, String(Date.now())); } catch {}
+    }
+
+    // impossible stat check
+    function hasImpossibleStats() {
+      const levelInput = document.getElementById('input-LVL');
+      let level = parseInt(levelInput.value);
+      if (isNaN(level) || level < 1 || level > 60) return true;
+
+      const n = level - 1;
+      const skill = skillData[currentType];
+      const effects = (skill && currentSkillLevel !== null && currentSkillLevel > 0) ? skill.effects : {};
+
+      for (const key of statKeys) {
+        const base = currentData.base[key];
+        const minGain = currentData.minGain[key];
+        const maxGain = currentData.maxGain[key];
+        const minPossible = base + n * minGain;
+        const maxPossible = base + n * maxGain;
+
+        const minAllowed = Math.max(0, minPossible * (1 - IMPOSSIBLE_TOLERANCE)) - 0.001;
+        const maxAllowed = maxPossible * (1 + IMPOSSIBLE_TOLERANCE) + 0.001;
+
+        const input = document.getElementById(`input-${key}`);
+        let value = parseFloat(input.value);
+        if (isNaN(value)) value = 0;
+
+        const eff = effects[key];
+        if (eff) {
+          const bonus = eff.values[currentSkillLevel];
+          if (eff.kind === 'percent') value = value / (1 + bonus / 100);
+          else if (eff.kind === 'flat') value = value - bonus;
+        }
+
+        if (value < minAllowed || value > maxAllowed) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function updateCalcButtonState() {
+      const skill = skillData[currentType];
+      const blocked = !!skill && currentSkillLevel === null;
+      calcBtn.disabled = blocked;
+      if (blocked) {
+        calcBtnWrap.setAttribute('data-tooltip', 'Please select a skill level first');
+      } else {
+        calcBtnWrap.removeAttribute('data-tooltip');
+      }
+      skillLevelSelect.classList.toggle('unset', blocked);
+    }
+
+    // ui build
     function buildStatsUI() {
       statsContainer.innerHTML = '';
 
       const levelRow = document.createElement('div');
-      levelRow.className = 'stat-row level-row';
+      levelRow.className = 'stat-row';
+      levelRow.id = 'row-LVL';
       levelRow.innerHTML = `
         <span class="stat-label">LVL</span>
         <input type="number" class="stat-input" id="input-LVL" min="1" max="60" step="1" value="1">
-        <div class="bar-wrapper">
-          <div class="bar-header">Percentile</div>
-        </div>
-        <span class="percent-spacer"></span>
       `;
       statsContainer.appendChild(levelRow);
 
       statKeys.forEach(key => {
         const row = document.createElement('div');
         row.className = 'stat-row';
+        row.id = 'row-' + key;
         row.innerHTML = `
           <span class="stat-label">${statLabels[key]}</span>
           <input type="number" class="stat-input" id="input-${key}" step="1" value="0">
-          <div class="bar-wrapper">
-            <div class="bar-labels"><span>1st</span><span>50th</span><span>99th</span></div>
-            <div class="bar-container">
-              <div class="bar" id="bar-${key}"></div>
-              <div class="avg-line"></div>
-            </div>
-          </div>
-          <span class="percent" id="percent-${key}">—</span>
         `;
         statsContainer.appendChild(row);
       });
-    }
-
-    function clearResults() {
-      statKeys.forEach(key => {
-        const bar = document.getElementById(`bar-${key}`);
-        if (bar) {
-          bar.style.width = '0%';
-          bar.style.backgroundColor = '#4caf50';
-        }
-        const percent = document.getElementById(`percent-${key}`);
-        if (percent) percent.textContent = '—';
-      });
-      calcFeedback.textContent = '';
-      calcFeedback.className = 'calc-feedback';
     }
 
     function resetInputs() {
       const levelInput = document.getElementById('input-LVL');
       levelInput.value = 1;
       statKeys.forEach(key => {
-        const input = document.getElementById(`input-${key}`);
-        input.value = currentData.base[key];
+        document.getElementById(`input-${key}`).value = currentData.base[key];
       });
-      clearResults();
+
+      ratingPane.classList.remove('active');
+      loadingWrap.classList.remove('active');
+      ratingCard.classList.remove('active');
+      ratingBadgeWrap.classList.remove('drop-active');
+      ratingBadgeWrap.classList.remove('shown');
+      ratingLabel.classList.remove('visible');
+      ratingScore.classList.remove('visible');
+      rankBarWrap.classList.remove('visible');
+      ratingTable.classList.remove('visible');
+      ratingTable.innerHTML = '';
+      rankBarFill.style.width = '0%';
+      rankBarRunner.style.left = '0%';
+      badgeFlash.classList.remove('active');
+      ratingPane.querySelectorAll('.confetti').forEach(c => c.remove());
+
+      calcFeedback.textContent = '';
+      calcFeedback.className = 'calc-feedback';
     }
 
     function updateSkillSelector() {
       const skill = skillData[currentType];
       if (!skill) {
         skillSelector.classList.add('hidden');
+        currentSkillLevel = 0;
+        updateCalcButtonState();
         return;
       }
       skillSelector.classList.remove('hidden');
       skillIcon.src = skill.icon;
       skillIcon.alt = skill.name;
       skillName.textContent = skill.name;
-      skillLevelSelect.value = '0';
-      currentSkillLevel = 0;
+      skillLevelSelect.value = '';
+      currentSkillLevel = null;
+      updateCalcButtonState();
     }
 
-    function updateAll() {
+    // percentile calc
+    function computePercentile(key) {
       const levelInput = document.getElementById('input-LVL');
       let level = parseInt(levelInput.value);
       if (isNaN(level) || level < 1) level = 1;
       if (level > 60) level = 60;
-      levelInput.value = level;
 
       const n = level - 1;
+      const base = currentData.base[key];
+      const minGain = currentData.minGain[key];
+      const maxGain = currentData.maxGain[key];
+
+      const mean = base + n * (minGain + maxGain) / 2;
+      const sigma = Math.sqrt(n) * (maxGain - minGain) / Math.sqrt(12);
+
+      const input = document.getElementById(`input-${key}`);
+      let value = parseFloat(input.value);
+      if (isNaN(value)) value = 0;
+
       const skill = skillData[currentType];
-      const effects = (skill && currentSkillLevel > 0) ? skill.effects : {};
+      const effects = (skill && currentSkillLevel !== null && currentSkillLevel > 0) ? skill.effects : {};
+      const eff = effects[key];
+      if (eff) {
+        const bonus = eff.values[currentSkillLevel];
+        if (eff.kind === 'percent') value = value / (1 + bonus / 100);
+        else if (eff.kind === 'flat') value = value - bonus;
+      }
 
-      statKeys.forEach(key => {
-        const base = currentData.base[key];
-        const minGain = currentData.minGain[key];
-        const maxGain = currentData.maxGain[key];
+      if (sigma === 0) return 50;
+      const z = (value - mean) / sigma;
+      return Math.max(0, Math.min(100, normalCDF(z) * 100));
+    }
 
-        const mean = base + n * (minGain + maxGain) / 2;
-        const sigma = Math.sqrt(n) * (maxGain - minGain) / Math.sqrt(12);
+    // loading bar
+    function runLoadingBar() {
+      return new Promise(resolve => {
+        const duration = 1000 + Math.random() * 2000;
+        const start = performance.now();
+        loadingFill.style.width = '0%';
+        loadingWrap.classList.add('active');
 
-        const input = document.getElementById(`input-${key}`);
-        let value = parseFloat(input.value);
-        if (isNaN(value)) value = 0;
+        const numStalls = 2 + Math.floor(Math.random() * 2);
+        const stallStarts = [];
+        for (let i = 0; i < numStalls; i++) {
+          stallStarts.push(0.15 + Math.random() * 0.65);
+        }
+        stallStarts.sort((a, b) => a - b);
 
-        let adjustedValue = value;
-        const eff = effects[key];
-        if (eff) {
-          const bonus = eff.values[currentSkillLevel];
-          if (eff.kind === 'percent') {
-            adjustedValue = value / (1 + bonus / 100);
-          } else if (eff.kind === 'flat') {
-            adjustedValue = value - bonus;
+        const checkpoints = [{ t: 0, p: 0 }];
+        let prevT = 0, prevP = 0;
+
+        for (const stallStart of stallStarts) {
+          const stallLength = 0.08 + Math.random() * 0.05;
+          const fastEnd = Math.max(prevT + 0.01, stallStart - stallLength);
+          if (fastEnd > prevT) {
+            const slope = 1.4 + Math.random() * 0.4;
+            const fastP = Math.min(0.94, prevP + (fastEnd - prevT) * slope);
+            checkpoints.push({ t: fastEnd, p: fastP });
+            prevT = fastEnd;
+            prevP = fastP;
+          }
+          const slowP = Math.min(0.96, prevP + 0.01 + Math.random() * 0.015);
+          checkpoints.push({ t: stallStart, p: slowP });
+          prevT = stallStart;
+          prevP = slowP;
+        }
+        checkpoints.push({ t: 1, p: 1 });
+
+        function progressAt(t) {
+          if (t <= 0) return 0;
+          if (t >= 1) return 1;
+          for (let i = 1; i < checkpoints.length; i++) {
+            if (t <= checkpoints[i].t) {
+              const a = checkpoints[i - 1];
+              const b = checkpoints[i];
+              const span = b.t - a.t;
+              if (span <= 0) return b.p;
+              const k = (t - a.t) / span;
+              return a.p + (b.p - a.p) * k;
+            }
+          }
+          return 1;
+        }
+
+        function tick(now) {
+          const t = Math.min(1, (now - start) / duration);
+          const p = progressAt(t);
+          loadingFill.style.width = Math.min(100, p * 100) + '%';
+          if (t < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            loadingFill.style.width = '100%';
+            setTimeout(resolve, 180);
           }
         }
-
-        let percentile;
-        if (sigma === 0) {
-          percentile = 50;
-        } else {
-          const z = (adjustedValue - mean) / sigma;
-          percentile = normalCDF(z) * 100;
-          percentile = Math.max(0, Math.min(100, percentile));
-        }
-
-        const bar = document.getElementById(`bar-${key}`);
-        bar.style.width = percentile + '%';
-
-        if (percentile < 1) {
-          bar.style.backgroundColor = '#808080';
-        } else if (percentile > 99) {
-          bar.style.backgroundColor = '#a335ee';
-        } else if (percentile < 25) {
-          bar.style.backgroundColor = '#d32f2f';
-        } else if (percentile < 50) {
-          bar.style.backgroundColor = '#ffc107';
-        } else if (percentile < 75) {
-          bar.style.backgroundColor = '#8bc34a';
-        } else {
-          bar.style.backgroundColor = '#2e7d32';
-        }
-
-        let label;
-        if (percentile < 1) label = '<1%';
-        else if (percentile > 99) label = '>99%';
-        else label = Math.round(percentile) + '%';
-        document.getElementById(`percent-${key}`).textContent = label;
+        requestAnimationFrame(tick);
       });
     }
 
-    // ---------- GOOGLE FORMS SUBMISSION ----------
-    // Creates a real hidden <form> and submits it via POST into a hidden
-    // iframe. This is the pattern Google Forms actually expects: GET on
-    // /formResponse returns 401, but a native form POST goes through cleanly.
-    async function submitData() {
-      const action = GOOGLE_FORMS_ACTION[currentType];
-      if (!action) {
-        console.info('[Calculator] No Google Form configured for', currentType);
-        return { ok: true, skipped: true };
+    // flash + confetti
+    function triggerBadgeFlash() {
+      badgeFlash.classList.remove('active');
+      void badgeFlash.offsetWidth;
+      badgeFlash.classList.add('active');
+    }
+
+    function createConfetti() {
+      const colors = ['#FFC107', '#FF5722', '#4CAF50', '#2196F3', '#9C27B0'];
+      const numParticles = 55;
+
+      const rect = ratingPane.getBoundingClientRect();
+      const cx = rect.width / 2;
+      const cy = rect.height * 0.32;
+
+      for (let i = 0; i < numParticles; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.left = cx + 'px';
+        confetti.style.top = cy + 'px';
+
+        const size = Math.random() * 8 + 6;
+        confetti.style.width = `${size}px`;
+        confetti.style.height = `${size}px`;
+
+        if (Math.random() > 0.5) confetti.style.borderRadius = '50%';
+
+        ratingPane.appendChild(confetti);
+
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 220 + 120;
+        const x = Math.cos(angle) * velocity;
+        const y = Math.sin(angle) * velocity - 120;
+        const duration = Math.random() * 900 + 700;
+        const rotation = Math.random() * 720 - 360;
+
+        const animation = confetti.animate([
+          { transform: 'translate(-50%, -50%) rotate(0deg)', opacity: 1 },
+          { transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotate(${rotation}deg)`, opacity: 0 }
+        ], {
+          duration: duration,
+          easing: 'cubic-bezier(0, .9, .57, 1)',
+          fill: 'forwards'
+        });
+
+        animation.onfinish = () => confetti.remove();
       }
+    }
+
+    // rating table
+    function buildRatingTable(percentiles, ranks) {
+      ratingTable.innerHTML = '';
+
+      const levelInput = document.getElementById('input-LVL');
+      const lvl = parseInt(levelInput.value) || 1;
+      const lvlRow = document.createElement('div');
+      lvlRow.className = 'rating-row';
+      lvlRow.innerHTML = `
+        <img class="rating-row-icon empty" src="" alt="">
+        <span class="rating-row-label">${currentType}</span>
+        <span class="rating-row-value">${lvl}</span>
+      `;
+      ratingTable.appendChild(lvlRow);
+
+      if (currentSkillLevel !== null && currentSkillLevel !== undefined) {
+        const skillRow = document.createElement('div');
+        skillRow.className = 'rating-row';
+        skillRow.innerHTML = `
+          <img class="rating-row-icon empty" src="" alt="">
+          <span class="rating-row-label">Skill</span>
+          <span class="rating-row-value">${currentSkillLevel}</span>
+        `;
+        ratingTable.appendChild(skillRow);
+      }
+
+      statKeys.forEach(key => {
+        const pct = percentiles[key];
+        const rank = ranks[key];
+        const val = document.getElementById(`input-${key}`).value;
+        const row = document.createElement('div');
+        row.className = 'rating-row';
+        row.innerHTML = `
+          <img class="rating-row-icon" src="${statRankImg(rank)}" alt="${RANK_NAMES[rank]}">
+          <span class="rating-row-label">${statLabels[key]}</span>
+          <span class="rating-row-value">${val}</span>
+        `;
+        ratingTable.appendChild(row);
+      });
+    }
+
+    // rank bar
+    function updateRankBar(overallRankKey, overallPct) {
+      const nextTier = nextRankTier(overallRankKey);
+
+      rankBarCurrent.src = rankImg(overallRankKey);
+      rankBarCurrent.alt = RANK_NAMES[overallRankKey];
+
+      if (nextTier) {
+        rankBarNext.src = rankImg(nextTier.key);
+        rankBarNext.alt = RANK_NAMES[nextTier.key];
+        rankBarNext.classList.remove('placeholder');
+      } else {
+        rankBarNext.src = '';
+        rankBarNext.alt = '';
+        rankBarNext.classList.add('placeholder');
+      }
+
+      const currentTier = RANK_TIERS.find(t => t.key === overallRankKey);
+      let progressPct = 100;
+      if (currentTier && nextTier) {
+        const range = nextTier.min - currentTier.min;
+        if (range > 0) {
+          progressPct = ((overallPct - currentTier.min) / range) * 100;
+          progressPct = Math.max(0, Math.min(100, progressPct));
+        }
+      }
+
+      rankBarFill.style.transition = 'none';
+      rankBarRunner.style.transition = 'none';
+      rankBarFill.style.width = '0%';
+      rankBarRunner.style.left = '0%';
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          rankBarFill.style.transition = 'width 1.5s ease-out';
+          rankBarRunner.style.transition = 'left 1.5s ease-out';
+          rankBarFill.style.width = progressPct + '%';
+          rankBarRunner.style.left = progressPct + '%';
+        });
+      });
+    }
+
+    // main rating flow
+    async function runRatingCalculation() {
+      if (calculating) return;
+      calculating = true;
+
+      const percentiles = {};
+      const ranks = {};
+      statKeys.forEach(key => {
+        const p = computePercentile(key);
+        percentiles[key] = p;
+        ranks[key] = rankKeyFor(p);
+      });
+
+      const weights = currentData.weights || {};
+      let weightedSum = 0;
+      let weightTotal = 0;
+      statKeys.forEach(k => {
+        const w = (typeof weights[k] === 'number' && weights[k] > 0) ? weights[k] : 0;
+        weightedSum += percentiles[k] * w;
+        weightTotal += w;
+      });
+      const avgPct = weightTotal > 0 ? weightedSum / weightTotal : 0;
+
+      const overallRank = rankKeyFor(avgPct);
+      const overallScore = Math.round(avgPct * 100);
+
+      ratingBadgeWrap.classList.remove('drop-active');
+      ratingBadgeWrap.classList.remove('shown');
+      badgeFlash.classList.remove('active');
+      ratingLabel.classList.remove('visible');
+      ratingScore.classList.remove('visible');
+      rankBarWrap.classList.remove('visible');
+      ratingTable.classList.remove('visible');
+      ratingTable.innerHTML = '';
+      rankBarFill.style.width = '0%';
+      rankBarRunner.style.left = '0%';
+      ratingPane.querySelectorAll('.confetti').forEach(c => c.remove());
+
+      ratingPane.classList.add('active');
+      ratingCard.classList.remove('active');
+      await runLoadingBar();
+
+      loadingWrap.classList.remove('active');
+      ratingCard.classList.add('active');
+      ratingBadge.src = rankImg(overallRank);
+
+      ratingBadgeWrap.classList.add('drop-active');
+
+      await sleep(600);
+      triggerBadgeFlash();
+      createConfetti();
+
+      await sleep(300);
+      ratingBadgeWrap.classList.remove('drop-active');
+      ratingBadgeWrap.classList.add('shown');
+
+      ratingLabel.textContent = 'RANK ' + RANK_NAMES[overallRank];
+      ratingLabel.classList.add('visible');
+      ratingScore.textContent = overallScore.toLocaleString();
+      ratingScore.classList.add('visible');
+
+      await sleep(400);
+      rankBarWrap.classList.add('visible');
+      updateRankBar(overallRank, avgPct);
+
+      await sleep(3000);
+
+      buildRatingTable(percentiles, ranks);
+      ratingTable.classList.add('visible');
+
+      calculating = false;
+    }
+
+    // submission - synchronous, fires form.submit() immediately
+    function submitData() {
+      const action = GOOGLE_FORMS_ACTION[currentType];
+      if (!action) return { ok: true, skipped: true };
 
       const levelInput = document.getElementById('input-LVL');
       const iframeName = 'gform_target_' + Date.now() + '_' + Math.random().toString(36).slice(2);
 
-      // Hidden iframe that will receive Google's response page
       const iframe = document.createElement('iframe');
       iframe.name = iframeName;
       iframe.style.display = 'none';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
       document.body.appendChild(iframe);
 
-      // Build the form
       const form = document.createElement('form');
       form.method = 'POST';
       form.action = action;
       form.target = iframeName;
       form.style.display = 'none';
+      form.acceptCharset = 'UTF-8';
 
       const addField = (name, value) => {
         if (!name) return;
@@ -1113,22 +1890,31 @@
       };
 
       addField(GOOGLE_FORM_FIELDS.level, levelInput.value);
-      addField(GOOGLE_FORM_FIELDS.skillLevel, currentSkillLevel);
+      addField(GOOGLE_FORM_FIELDS.skillLevel, currentSkillLevel == null ? 0 : currentSkillLevel);
       statKeys.forEach(key => {
-        addField(GOOGLE_FORM_FIELDS[key], document.getElementById(`input-${key}`).value);
+        const el = document.getElementById(`input-${key}`);
+        addField(GOOGLE_FORM_FIELDS[key], el ? el.value : '');
       });
 
       document.body.appendChild(form);
-      form.submit();
 
-      // Clean up after giving the request time to complete
-      return new Promise(resolve => {
-        setTimeout(() => {
-          try { document.body.removeChild(form); } catch (_) {}
-          try { document.body.removeChild(iframe); } catch (_) {}
-          resolve({ ok: true });
-        }, 1500);
-      });
+      // fire the submit synchronously
+      try {
+        form.submit();
+      } catch (err) {
+        console.error('[submit] failed:', err);
+        try { document.body.removeChild(form); } catch (_) {}
+        try { document.body.removeChild(iframe); } catch (_) {}
+        return { ok: false, error: err.message };
+      }
+
+      // cleanup later
+      setTimeout(() => {
+        try { document.body.removeChild(form); } catch (_) {}
+        try { document.body.removeChild(iframe); } catch (_) {}
+      }, 3000);
+
+      return { ok: true };
     }
 
     function updateType() {
@@ -1148,61 +1934,64 @@
     select.addEventListener('change', updateType);
 
     skillLevelSelect.addEventListener('change', () => {
-      currentSkillLevel = parseInt(skillLevelSelect.value) || 0;
-      clearResults();
+      const val = skillLevelSelect.value;
+      currentSkillLevel = (val === '') ? null : parseInt(val, 10);
+      ratingPane.classList.remove('active');
+      loadingWrap.classList.remove('active');
+      ratingCard.classList.remove('active');
+      ratingBadgeWrap.classList.remove('shown');
+      ratingLabel.classList.remove('visible');
+      ratingScore.classList.remove('visible');
+      rankBarWrap.classList.remove('visible');
+      ratingTable.classList.remove('visible');
+      badgeFlash.classList.remove('active');
+      updateCalcButtonState();
     });
 
-    // ---------- CALCULATE BUTTON ----------
     calcBtn.addEventListener('click', async () => {
-      updateAll();
-
-      const check = checkDailyLimit();
-      if (check.blocked) {
-        calcFeedback.textContent = `Daily limit reached (${DAILY_LIMIT}/day). Results shown, but this submission was not sent.`;
-        calcFeedback.className = 'calc-feedback err';
-        updateRemainingNote();
+      const skill = skillData[currentType];
+      if (skill && currentSkillLevel === null) {
+        updateCalcButtonState();
         return;
       }
 
-      calcBtn.disabled = true;
-      calcFeedback.textContent = 'Submitting…';
+      calcFeedback.textContent = '';
       calcFeedback.className = 'calc-feedback';
 
-      const result = await submitData();
-
-      if (result.skipped) {
-        calcFeedback.textContent = '';
-        calcFeedback.className = 'calc-feedback';
-      } else if (result.ok) {
-        recordSubmission();
-        const remaining = check.remaining - 1;
-        calcFeedback.textContent = `✓ Results submitted — thank you! (${remaining} left today)`;
-        calcFeedback.className = 'calc-feedback ok';
-        updateRemainingNote();
-      } else {
-        calcFeedback.textContent = '⚠ Submission failed (results shown anyway)';
+      const cooldownSec = getCooldownRemainingSeconds();
+      if (cooldownSec > 0) {
+        calcFeedback.textContent = `It's been too recent since your last calculation — please wait ${cooldownSec} second${cooldownSec === 1 ? '' : 's'}.`;
         calcFeedback.className = 'calc-feedback err';
+        return;
       }
 
-      calcBtn.disabled = false;
-
-      setTimeout(() => {
-        if (calcFeedback.classList.contains('ok')) {
-          calcFeedback.textContent = '';
-          calcFeedback.className = 'calc-feedback';
+      // submit first - synchronous call, form fires immediately
+      if (debugMode) {
+        console.log('[calc] debug mode - submission skipped');
+      } else if (hasImpossibleStats()) {
+        console.log('[calc] submission skipped - impossible stats');
+      } else {
+        const result = submitData();
+        if (result.ok && !result.skipped) {
+          markSubmitTime();
+        } else if (!result.ok) {
+          console.error('[calc] submission failed:', result.error);
         }
-      }, 5000);
+      }
+
+      // then run the rating animation
+      runRatingCalculation();
     });
 
-    // ---------- DARK MODE ----------
+    // theme
     const themeToggle = document.getElementById('themeToggle');
     function applyTheme(dark) {
       if (dark) {
         document.body.classList.add('dark');
-        themeToggle.textContent = '☀️Mode';
+        themeToggle.textContent = 'Light';
       } else {
         document.body.classList.remove('dark');
-        themeToggle.textContent = '🌙Mode';
+        themeToggle.textContent = 'Dark';
       }
     }
     if (localStorage.getItem('theme') === 'light') applyTheme(false);
@@ -1214,9 +2003,7 @@
       localStorage.setItem('theme', isDark ? 'light' : 'dark');
     });
 
-    // ================================================================
-    //  MASK-BASED OCR
-    // ================================================================
+    // ocr
     const ocrToggle = document.getElementById('ocrToggle');
     const ocrModal = document.getElementById('ocrModal');
     const ocrClose = document.getElementById('ocrClose');
@@ -1329,7 +2116,6 @@
         const y = box.y * MASK_H;
         const w = box.w * MASK_W;
         const h = box.h * MASK_H;
-
         ctx.fillStyle = 'rgba(0,0,0,0.10)';
         ctx.fillRect(x, y, w, h);
         ctx.strokeRect(x, y, w, h);
@@ -1428,9 +2214,7 @@
       redrawMask();
     });
 
-    resetFitBtn.addEventListener('click', () => {
-      fitImageToMask();
-    });
+    resetFitBtn.addEventListener('click', () => fitImageToMask());
 
     function cropRegion(region) {
       const r = region.read;
@@ -1451,10 +2235,8 @@
       c.width = dstW;
       c.height = dstH;
       const ctx = c.getContext('2d');
-
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, dstW, dstH);
-
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(uploadedImageEl, sx, sy, sw, sh, 0, 0, dstW, dstH);
@@ -1464,17 +2246,13 @@
       const CONTRAST = 2.8;
       const BRIGHTNESS = 20;
       const THRESHOLD = 128;
-
       for (let i = 0; i < d.length; i += 4) {
         const gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
         let boosted = (gray - 128) * CONTRAST + 128 + BRIGHTNESS;
-        let out;
-        if (boosted < THRESHOLD) out = 0;
-        else out = 255;
+        let out = boosted < THRESHOLD ? 0 : 255;
         d[i] = d[i + 1] = d[i + 2] = out;
       }
       ctx.putImageData(id, 0, 0);
-
       return c;
     }
 
@@ -1487,55 +2265,35 @@
 
     function collectOcrProblems(results) {
       const problems = [];
-      const order = Object.keys(MASK_REGIONS);
-      for (const key of order) {
+      for (const key of Object.keys(MASK_REGIONS)) {
         const r = results[key];
         if (!r) continue;
         const digits = (r.raw || '').replace(/\D/g, '');
-
-        if (digits.length === 0) {
-          problems.push({ key, reason: 'empty' });
-          continue;
-        }
-        if (digits.startsWith('0')) {
-          problems.push({ key, reason: 'leading-zero' });
-          continue;
-        }
-        if (digits.length === 1 && !SINGLE_DIGIT_OK.has(key)) {
-          problems.push({ key, reason: 'single-digit' });
-        }
+        if (digits.length === 0) { problems.push(key); continue; }
+        if (digits.startsWith('0')) { problems.push(key); continue; }
+        if (digits.length === 1 && !SINGLE_DIGIT_OK.has(key)) { problems.push(key); }
       }
       return problems;
     }
 
     function showOcrWarnings(problems) {
-      if (problems.length === 0) {
-        hideOcrWarnings();
-        return;
-      }
-      const names = problems.map(p => p.key).join(', ');
-      ocrWarnings.textContent = 'OCR Problems with: ' + names;
+      if (problems.length === 0) { hideOcrWarnings(); return; }
+      ocrWarnings.textContent = 'OCR Problems with: ' + problems.join(', ');
       ocrWarnings.classList.add('visible');
     }
 
     readValuesBtn.addEventListener('click', async () => {
       if (!uploadedImageEl) return;
       const chosenType = getSelectedOcrType();
-      if (!chosenType) {
-        ocrStatus.className = 'ocr-status error';
-        ocrStatus.textContent = 'Please select a Homunculus before reading values.';
-        updateReadButtonState();
-        return;
-      }
+      if (!chosenType) return;
 
       readValuesBtn.disabled = true;
       hideOcrWarnings();
       ocrStatus.className = 'ocr-status';
-      ocrStatus.textContent = 'Loading OCR engine (first run downloads ~10 MB)...';
+      ocrStatus.textContent = 'Loading OCR engine...';
 
       try {
         await loadTesseract();
-
         const worker = await Tesseract.createWorker('eng', 1, {
           logger: (m) => {
             if (m.status && m.status !== 'loading tesseract core' && m.status !== 'recognizing text') {
@@ -1543,7 +2301,6 @@
             }
           }
         });
-
         await worker.setParameters({
           tessedit_char_whitelist: '0123456789',
           tessedit_pageseg_mode: '7'
@@ -1551,73 +2308,46 @@
 
         const results = {};
         const order = Object.keys(MASK_REGIONS);
-
         for (let i = 0; i < order.length; i++) {
           const key = order[i];
           const region = MASK_REGIONS[key];
           ocrStatus.className = 'ocr-status progress';
           ocrStatus.textContent = `Reading ${region.label}… (${i + 1}/${order.length})`;
-
           const crop = cropRegion(region);
           let rawText = '';
           try {
             const { data: { text } } = await worker.recognize(crop);
             rawText = (text || '').trim();
-          } catch (err) {
-            console.error('OCR error on', key, err);
-          }
+          } catch (err) {}
           const digits = rawText.replace(/\D/g, '');
-          const value = digits ? parseInt(digits, 10) : null;
-          results[key] = { raw: rawText, value };
+          results[key] = { raw: rawText, value: digits ? parseInt(digits, 10) : null };
         }
-
         await worker.terminate();
 
         let filled = 0;
-
-        if (results.LVL && results.LVL.value !== null && !isNaN(results.LVL.value)) {
-          const levelInput = document.getElementById('input-LVL');
-          if (levelInput) {
-            levelInput.value = Math.min(60, Math.max(1, results.LVL.value));
+        if (results.LVL && results.LVL.value !== null) {
+          document.getElementById('input-LVL').value = Math.min(60, Math.max(1, results.LVL.value));
+          filled++;
+        }
+        statKeys.forEach(key => {
+          const r = results[key];
+          if (r && r.value !== null) {
+            document.getElementById(`input-${key}`).value = r.value;
             filled++;
           }
-        }
-
-        ['HP', 'SP', 'ATK', 'MATK', 'HIT', 'CRITICAL', 'DEF', 'MDEF', 'FLEE', 'ASPD'].forEach(key => {
-          const r = results[key];
-          if (r && r.value !== null && !isNaN(r.value)) {
-            const input = document.getElementById(`input-${key}`);
-            if (input) {
-              input.value = r.value;
-              filled++;
-            }
-          }
         });
-
-        clearResults();
-
-        const debugLines = order
-          .filter(k => results[k])
-          .map(k => {
-            const v = results[k].value;
-            const r = results[k].raw || '(empty)';
-            return `${k.padEnd(9)} → ${v !== null ? v : '?'}    [raw: "${r}"]`;
-          });
-        if (rawTextBox) rawTextBox.textContent = debugLines.join('\n');
-        if (rawTextWrap) rawTextWrap.style.display = 'block';
 
         const problems = collectOcrProblems(results);
         showOcrWarnings(problems);
 
         if (filled === 0) {
           ocrStatus.className = 'ocr-status error';
-          ocrStatus.textContent = 'No values detected. Try zooming/aligning the image more precisely.';
+          ocrStatus.textContent = 'No values detected.';
         } else {
           ocrStatus.className = 'ocr-status success';
-          ocrStatus.textContent = `✓ Filled ${filled} field${filled === 1 ? '' : 's'} for ${chosenType}. Close this window, then click Calculate.`;
+          ocrStatus.textContent = `✓ Filled ${filled} field(s) for ${chosenType}.`;
         }
       } catch (err) {
-        console.error(err);
         ocrStatus.className = 'ocr-status error';
         ocrStatus.textContent = 'OCR failed: ' + err.message;
       } finally {
@@ -1627,7 +2357,6 @@
 
     updateReadButtonState();
     redrawMask();
-    updateRemainingNote();
   </script>
 </body>
 </html>
