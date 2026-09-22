@@ -143,7 +143,6 @@
       opacity: 1;
     }
     .debug-toggle.active:hover { color: #b71c1c; }
-    /* keeps layout space even when hidden */
     .debug-toggle.hidden {
       visibility: hidden;
       pointer-events: none;
@@ -1234,8 +1233,14 @@
       ASPD:       'entry.2118125795'
     };
 
-    const LAST_SUBMIT_KEY = 'homunculus_last_submit';
-    const COOLDOWN_MS = 60 * 1000;
+    // two cooldowns:
+    //   display cooldown: 1 min, visible, blocks animation + submission
+    //   submit cooldown: 10 min, hidden, blocks only submission
+    const DISPLAY_COOLDOWN_KEY = 'homunculus_last_submit';
+    const SUBMIT_COOLDOWN_KEY  = 'homunculus_last_submission';
+    const DISPLAY_COOLDOWN_MS  = 60 * 1000;
+    const SUBMIT_COOLDOWN_MS   = 10 * 60 * 1000;
+    const MIN_SUBMIT_LEVEL     = 2;
     const IMPOSSIBLE_TOLERANCE = 0.20;
 
     // rank tiers
@@ -1422,16 +1427,25 @@
       debugLabelEl.classList.toggle('active', debugMode);
     });
 
-    // cooldown
-    function getCooldownRemainingSeconds() {
-      const last = parseInt(localStorage.getItem(LAST_SUBMIT_KEY) || '0', 10) || 0;
-      const elapsed = Date.now() - last;
-      const remaining = COOLDOWN_MS - elapsed;
+    // cooldowns
+    function getDisplayCooldownSeconds() {
+      const last = parseInt(localStorage.getItem(DISPLAY_COOLDOWN_KEY) || '0', 10) || 0;
+      const remaining = DISPLAY_COOLDOWN_MS - (Date.now() - last);
       return remaining > 0 ? Math.ceil(remaining / 1000) : 0;
     }
 
-    function markSubmitTime() {
-      try { localStorage.setItem(LAST_SUBMIT_KEY, String(Date.now())); } catch {}
+    function getSubmitCooldownSeconds() {
+      const last = parseInt(localStorage.getItem(SUBMIT_COOLDOWN_KEY) || '0', 10) || 0;
+      const remaining = SUBMIT_COOLDOWN_MS - (Date.now() - last);
+      return remaining > 0 ? Math.ceil(remaining / 1000) : 0;
+    }
+
+    function markDisplaySubmitTime() {
+      try { localStorage.setItem(DISPLAY_COOLDOWN_KEY, String(Date.now())); } catch {}
+    }
+
+    function markFormSubmitTime() {
+      try { localStorage.setItem(SUBMIT_COOLDOWN_KEY, String(Date.now())); } catch {}
     }
 
     // impossible stat check
@@ -1958,28 +1972,35 @@
       calcFeedback.textContent = '';
       calcFeedback.className = 'calc-feedback';
 
-      const cooldownSec = getCooldownRemainingSeconds();
-      if (cooldownSec > 0) {
-        calcFeedback.textContent = `It's been too recent since your last calculation — please wait ${cooldownSec} second${cooldownSec === 1 ? '' : 's'}.`;
+      // visible 1-min cooldown - blocks everything (animation + submission)
+      const displayCooldown = getDisplayCooldownSeconds();
+      if (displayCooldown > 0) {
+        calcFeedback.textContent = `It's been too recent since your last calculation — please wait ${displayCooldown} second${displayCooldown === 1 ? '' : 's'}.`;
         calcFeedback.className = 'calc-feedback err';
         return;
       }
 
-      // submit first - synchronous call, form fires immediately
-      if (debugMode) {
-        console.log('[calc] debug mode - submission skipped');
-      } else if (hasImpossibleStats()) {
-        console.log('[calc] submission skipped - impossible stats');
-      } else {
+      // silent checks: block submission only, animation still runs
+      const levelInput = document.getElementById('input-LVL');
+      const currentLevel = parseInt(levelInput.value) || 0;
+
+      const canSubmit =
+        !debugMode &&
+        currentLevel >= MIN_SUBMIT_LEVEL &&
+        getSubmitCooldownSeconds() === 0 &&
+        !hasImpossibleStats();
+
+      if (canSubmit) {
         const result = submitData();
         if (result.ok && !result.skipped) {
-          markSubmitTime();
+          markDisplaySubmitTime();
+          markFormSubmitTime();
         } else if (!result.ok) {
           console.error('[calc] submission failed:', result.error);
         }
       }
 
-      // then run the rating animation
+      // animation runs regardless of submission outcome
       runRatingCalculation();
     });
 
