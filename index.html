@@ -1243,6 +1243,11 @@
     const MIN_SUBMIT_LEVEL     = 2;
     const IMPOSSIBLE_TOLERANCE = 0.20;
 
+    // per-stat hard caps (values at or above cap count as maxed)
+    const STAT_CAPS = {
+      ASPD: 190
+    };
+
     // rank tiers
     const RANK_TIERS = [
       { key: 'f',  min:  0,  max:  1 },
@@ -1452,7 +1457,7 @@
     function hasImpossibleStats() {
       const levelInput = document.getElementById('input-LVL');
       let level = parseInt(levelInput.value);
-      if (isNaN(level) || level < 1 || level > 60) return true;
+      if (isNaN(level) || level < 1 || level > 70) return true;
 
       const n = level - 1;
       const skill = skillData[currentType];
@@ -1466,7 +1471,13 @@
         const maxPossible = base + n * maxGain;
 
         const minAllowed = Math.max(0, minPossible * (1 - IMPOSSIBLE_TOLERANCE)) - 0.001;
-        const maxAllowed = maxPossible * (1 + IMPOSSIBLE_TOLERANCE) + 0.001;
+        let maxAllowed = maxPossible * (1 + IMPOSSIBLE_TOLERANCE) + 0.001;
+
+        // hard cap: values above the in-game cap are impossible
+        const cap = STAT_CAPS[key];
+        if (cap !== undefined) {
+          maxAllowed = Math.min(maxAllowed, cap + 0.5);
+        }
 
         const input = document.getElementById(`input-${key}`);
         let value = parseFloat(input.value);
@@ -1507,7 +1518,7 @@
       levelRow.id = 'row-LVL';
       levelRow.innerHTML = `
         <span class="stat-label">LVL</span>
-        <input type="number" class="stat-input" id="input-LVL" min="1" max="60" step="1" value="1">
+        <input type="number" class="stat-input" id="input-LVL" min="1" max="70" step="1" value="1">
       `;
       statsContainer.appendChild(levelRow);
 
@@ -1571,7 +1582,7 @@
       const levelInput = document.getElementById('input-LVL');
       let level = parseInt(levelInput.value);
       if (isNaN(level) || level < 1) level = 1;
-      if (level > 60) level = 60;
+      if (level > 70) level = 70;
 
       const n = level - 1;
       const base = currentData.base[key];
@@ -1593,6 +1604,10 @@
         if (eff.kind === 'percent') value = value / (1 + bonus / 100);
         else if (eff.kind === 'flat') value = value - bonus;
       }
+
+      // hard cap: if a stat is at or above its in-game cap, it's maxed out
+      const cap = STAT_CAPS[key];
+      if (cap !== undefined && value >= cap) return 100;
 
       if (sigma === 0) return 50;
       const z = (value - mean) / sigma;
@@ -2347,7 +2362,7 @@
 
         let filled = 0;
         if (results.LVL && results.LVL.value !== null) {
-          document.getElementById('input-LVL').value = Math.min(60, Math.max(1, results.LVL.value));
+          document.getElementById('input-LVL').value = Math.min(70, Math.max(1, results.LVL.value));
           filled++;
         }
         statKeys.forEach(key => {
