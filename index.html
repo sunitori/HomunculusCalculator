@@ -1243,6 +1243,9 @@
     const MIN_SUBMIT_LEVEL     = 2;
     const IMPOSSIBLE_TOLERANCE = 0.20;
 
+    // maximum homunculus level supported by the calculator
+    const MAX_LEVEL = 70;
+
     // per-stat hard caps (values at or above cap count as maxed)
     const STAT_CAPS = {
       ASPD: 190
@@ -1457,7 +1460,7 @@
     function hasImpossibleStats() {
       const levelInput = document.getElementById('input-LVL');
       let level = parseInt(levelInput.value);
-      if (isNaN(level) || level < 1 || level > 70) return true;
+      if (isNaN(level) || level < 1 || level > MAX_LEVEL) return true;
 
       const n = level - 1;
       const skill = skillData[currentType];
@@ -1518,7 +1521,7 @@
       levelRow.id = 'row-LVL';
       levelRow.innerHTML = `
         <span class="stat-label">LVL</span>
-        <input type="number" class="stat-input" id="input-LVL" min="1" max="70" step="1" value="1">
+        <input type="number" class="stat-input" id="input-LVL" min="1" max="${MAX_LEVEL}" step="1" value="1">
       `;
       statsContainer.appendChild(levelRow);
 
@@ -1533,6 +1536,17 @@
         statsContainer.appendChild(row);
       });
     }
+
+    // clamp LVL input to [1, MAX_LEVEL] as user types / pastes / uses arrows
+    statsContainer.addEventListener('input', (e) => {
+      if (e.target.id !== 'input-LVL') return;
+      const raw = e.target.value;
+      if (raw === '') return; // allow empty while editing
+      let v = parseInt(raw, 10);
+      if (isNaN(v)) return;
+      if (v > MAX_LEVEL) e.target.value = MAX_LEVEL;
+      else if (v < 1) e.target.value = 1;
+    });
 
     function resetInputs() {
       const levelInput = document.getElementById('input-LVL');
@@ -1582,7 +1596,7 @@
       const levelInput = document.getElementById('input-LVL');
       let level = parseInt(levelInput.value);
       if (isNaN(level) || level < 1) level = 1;
-      if (level > 70) level = 70;
+      if (level > MAX_LEVEL) level = MAX_LEVEL;
 
       const n = level - 1;
       const base = currentData.base[key];
@@ -2362,7 +2376,7 @@
 
         let filled = 0;
         if (results.LVL && results.LVL.value !== null) {
-          document.getElementById('input-LVL').value = Math.min(70, Math.max(1, results.LVL.value));
+          document.getElementById('input-LVL').value = Math.min(MAX_LEVEL, Math.max(1, results.LVL.value));
           filled++;
         }
         statKeys.forEach(key => {
